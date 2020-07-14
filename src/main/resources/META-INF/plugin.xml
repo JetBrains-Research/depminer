@@ -16,7 +16,7 @@
 
     <actions>
         <!-- Add your actions here -->
-        <action id="ResolveElementAtCaretAction" class="ResolveElementAction"
+        <action id="ResolveElementAction" class="ResolveElementAction"
                 text="Find Element Declaration Test"
                 description="Finds element&#39;s declaration from the reference, if applicable">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
