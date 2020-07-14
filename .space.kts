@@ -1,3 +1,11 @@
 job("Build and run tests") {
-   gradlew("openjdk:11", "build")
+    container("openjdk:11") {
+        resources {
+            memory = 768
+        }
+
+        kotlinScript { api ->
+            api.gradlew("build")
+        }
+    }
 }
