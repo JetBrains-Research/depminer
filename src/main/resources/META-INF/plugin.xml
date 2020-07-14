@@ -1,0 +1,25 @@
+<idea-plugin>
+    <id>org.example.dependencies-plugin-idea</id>
+    <name>depedencies-miner</name>
+    <vendor email="vlad.repinskiy@jetbrains.com">Vlad Repinskiy</vendor>
+
+    <description>A plugin that allows dependencies data mining</description>
+
+    <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="ResolveElementAtCaretAction" class="ResolveElementAction"
+                text="Find Element Declaration Test"
+                description="Finds element&#39;s declaration from the reference, if applicable">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
