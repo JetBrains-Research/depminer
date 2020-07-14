@@ -13,7 +13,7 @@ class ResolveElementAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val elementFinder = GetElementAtCaret()
         val element: PsiElement? = elementFinder.getElement(e)
-        var infoContainer = StringBuilder()
+        val infoContainer = StringBuilder()
         if (element != null) {
             infoContainer
                 .append("Element at caret: ")
