@@ -1,5 +1,6 @@
 package org.jetbrains.research.depminer.actions
 
+import com.intellij.openapi.project.ProjectManager
 import org.jetbrains.research.depminer.model.AnalysisScope
 import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.ProjectScope
@@ -9,5 +10,6 @@ fun getProjectDependencies(projectPath: String): Collection<Dependency> {
 }
 
 private fun getDependencies(scope: AnalysisScope): Collection<Dependency> {
+
     return emptyList()
 }

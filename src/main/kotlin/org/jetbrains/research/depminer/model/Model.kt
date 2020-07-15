@@ -1,5 +1,7 @@
 package org.jetbrains.research.depminer.model
 
+import java.io.File
+
 enum class ConnectionType {
     USAGE // "from" is declared in "to"
 }
@@ -37,6 +39,12 @@ class FileScope(val path: String): AnalysisScope {
 
 class ProjectScope(val path: String): AnalysisScope {
     override fun getLocations(): List<LocationInfo> {
-        TODO("Not yet implemented")
+        val analysisScope = mutableListOf<LocationInfo>()
+        File(path).walk().forEach {
+            if (it.isFile) {
+                analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+            }
+        }
+        return analysisScope
     }
 }
