@@ -1,7 +1,7 @@
 job("Build and run tests") {
     container("openjdk:11") {
         resources {
-            memory = 1536
+            memory = 4096
         }
 
         kotlinScript { api ->
