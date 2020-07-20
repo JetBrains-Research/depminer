@@ -8,7 +8,7 @@ import java.io.File
  */
 enum class ConnectionType {
     USAGE, // "from" is declared in "to"
-    UNKNOWN // going to use this for now
+    UNKNOWN  // going to use this for now
 }
 
 /**
@@ -18,7 +18,8 @@ enum class ElementType {
     FILE,
     CLASS,
     FUNCTION,
-    LINE
+    LINE,
+    UNKNOWN
 }
 
 /**
@@ -82,7 +83,10 @@ class ProjectScope(val path: String): AnalysisScope {
         val analysisScope = mutableListOf<LocationInfo>()
         File(path).walk().forEach {
             if (it.isFile) {
-                analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+                 if (!it.absolutePath.contains(".idea")) {
+                     // Excluding .idea folder files for now
+                     analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+                 }
             }
         }
         return analysisScope

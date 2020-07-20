@@ -1,5 +1,6 @@
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationStarter
+import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.Dependency
 import java.io.File
 import kotlin.system.exitProcess
@@ -13,6 +14,8 @@ const val testContent = "test"
 
 class IdeRunner : ApplicationStarter {
 
+    val projectPath = System.getProperty("user.dir")
+
     override fun getCommandName(): String = "mine-dependencies"
 
     override fun main(args: Array<out String>) {
@@ -24,10 +27,10 @@ class IdeRunner : ApplicationStarter {
             exitProcess(0)
         }
 
-        println("IDEA instance started")
-        val inputDir = File(System.getProperty("user.dir")).resolve(args[1])
+        println("IDEA instance started. . . ")
+        val inputDir = File(projectPath).resolve(args[1])
         println(inputDir.absolutePath)
-        val outputDir = File(System.getProperty("user.dir")).resolve(args[2])
+        val outputDir = File(projectPath).resolve(args[2])
         println(outputDir.absolutePath)
         val project = ProjectUtil.openOrImport(inputDir.absolutePath, null, true)
 
@@ -38,7 +41,9 @@ class IdeRunner : ApplicationStarter {
 
         println("Successfully opened project at inputDir: $project")
 
-        outputDir.resolve(testOutput).writeText(testContent)
+        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
+
+        outputDir.resolve(testOutput).writeText(dependencies.toString())
         exitProcess(0)
     }
 }
