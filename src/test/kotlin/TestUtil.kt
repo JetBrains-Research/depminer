@@ -1,7 +1,7 @@
 import java.io.File
 
 fun runIde(): Int {
-    val command = "./gradlew extractDependencies"
+    val command = "./extract-dependencies.sh . ."
     
     val process = Runtime.getRuntime().exec(command)
 //    val process = ProcessBuilder(command)
