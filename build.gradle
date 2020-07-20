@@ -32,3 +32,11 @@ patchPluginXml {
       Add change notes here.<br>
       <em>most HTML tags may be used</em>"""
 }
+
+runIde {
+    args = ["extract-dependencies"]
+}
+
+task extractDependencies {
+    dependsOn("runIde")
+}
