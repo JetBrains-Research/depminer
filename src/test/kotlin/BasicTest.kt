@@ -3,8 +3,10 @@ import org.jetbrains.research.depminer.model.CodeElement
 import org.jetbrains.research.depminer.model.FileRange
 import org.jetbrains.research.depminer.model.LocationInfo
 import org.jetbrains.research.depminer.model.ProjectScope
+import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Test
+import java.io.File
 import kotlin.test.assertEquals
 
 fun LocationInfo.isInFile(fileName: String): Boolean {
@@ -16,6 +18,14 @@ fun CodeElement.isInFile(fileName: String): Boolean {
 }
 
 class BasicTest {
+    companion object {
+        @AfterClass
+        @JvmStatic
+        fun cleanUp() {
+            cleanUpTestFiles()
+        }
+    }
+    
     @Test
     fun projectScopeDefinedCorrectly() {
         val projectPath = System.getProperty("user.dir")
