@@ -44,7 +44,7 @@ class BasicTest {
     fun kotlinIdeaProject() {
         val projectPath = System.getProperty("user.dir")
         val dependencies = getProjectDependencies("$projectPath/src/test/resources/testProjects/kotlinIdea")
-        //Assert.assertNotEquals("The dependencies list should not be empty", dependencies)
+        Assert.assertFalse("Dependencies list should not be empty",dependencies.isEmpty())
         Assert.assertTrue("Main.kt should depend on Util.kt",
             dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
     }
@@ -52,9 +52,7 @@ class BasicTest {
     @Test
     fun runner() {
         val exitCode = runIde()
-        
         assertEquals(0, exitCode, "The IDE should finish with exit code 0")
-
         assertEquals(testContent, readTestFile(), "Content of the output should match the expected")
     }
 }
