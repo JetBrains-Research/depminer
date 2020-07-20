@@ -34,7 +34,7 @@ patchPluginXml {
 }
 
 runIde {
-    args = ["extract-dependencies"]
+    args = ["mine-dependencies"]
 }
 
 task extractDependencies {

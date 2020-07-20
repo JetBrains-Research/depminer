@@ -1,11 +1,16 @@
-import org.jetbrains.research.depminer.runner.testContent
-import org.jetbrains.research.depminer.runner.testOutput
 import java.io.File
 
-fun runIde() {
+fun runIde(): Int {
     val command = "./gradlew extractDependencies"
     
-    Runtime.getRuntime().exec(command)
+    val process = Runtime.getRuntime().exec(command)
+//    val process = ProcessBuilder(command)
+//        .directory(File("/Users/vladimir.kovalenko/work/dependencies-plugin/"))
+//        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+//        .redirectError(ProcessBuilder.Redirect.INHERIT)
+//        .start()
+    
+    return process.waitFor()
 }
 
 fun readTestFile(): String {

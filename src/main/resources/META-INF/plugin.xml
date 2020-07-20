@@ -12,6 +12,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <appStarter implementation="IdeRunner"/>
     </extensions>
 
     <actions>
