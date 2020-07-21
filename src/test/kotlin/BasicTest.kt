@@ -54,4 +54,11 @@ class BasicTest {
 //        Assert.assertTrue("Main.kt should depend on Util.kt",
 //            dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
     }
+
+    @Test
+    fun `Java Test Project Runs`() {
+        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        val exitCode = runIde(testInputPath, ".")
+        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+    }
 }

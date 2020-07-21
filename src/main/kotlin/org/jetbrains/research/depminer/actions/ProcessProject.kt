@@ -19,13 +19,11 @@ fun getFileDependencies(filePath: String, project: Project): Collection<Dependen
 private fun getDependencies(scope: AnalysisScope, project: Project): Collection<Dependency> {
     val psiFiles = mutableListOf<PsiFile>()
     for (element in scope.getLocations()) {
-        if (project != null) {
-            val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(element.path))
-            if (virtualFile != null) {
-                val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
-                if (psiFile != null) {
-                    psiFiles.add(psiFile)
-                }
+        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(element.path))
+        if (virtualFile != null) {
+            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
+            if (psiFile != null) {
+                psiFiles.add(psiFile)
             }
         }
     }
@@ -38,7 +36,7 @@ private fun findDependenciesInList(psiFiles: Collection<PsiFile>): Collection<De
         element.accept(object: PsiRecursiveElementVisitor()
         {
             override fun visitElement(element: PsiElement) {
-                println("We at da element ${element.toString()}")
+                println("Inspecting element: ${element.toString()}")
                 dependenciesMap.addAll(visitPsiElement(element))
                 super.visitElement(element)
             }
@@ -50,14 +48,17 @@ private fun findDependenciesInList(psiFiles: Collection<PsiFile>): Collection<De
 private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
     val dependenciesMap = mutableListOf<Dependency>()
     val references = psiElement.references
+    println("This elements reference: ${references.toString()}")
     for (ref in references) {
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
-            println("And it be resolvin to: ${elementDeclaration.toString()}")
-            val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
-            val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
-            val currentDependency = Dependency(ConnectionType.UNKNOWN, codeElement, codeElementDeclaration)
-            dependenciesMap.add(currentDependency)
+            println("And it resolves to: ${elementDeclaration.toString()}")
+            if (elementDeclaration.containingFile != null) {
+                val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
+                val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
+                val currentDependency = Dependency(ConnectionType.UNKNOWN, codeElement, codeElementDeclaration)
+                dependenciesMap.add(currentDependency)
+            }
         }
     }
     return dependenciesMap
