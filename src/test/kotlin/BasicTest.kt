@@ -61,7 +61,7 @@ class BasicTest {
     }
 
     @Test
-    fun `Dependency Between Two Files Detected - kotlin Idea Project` () {
+    fun `Dependency Between Two Files Detected - Kotlin Idea Project` () {
         val testInputPath = "src/test/resources/testProjects/kotlinIdea"
         val exitCode = runIde(testInputPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
