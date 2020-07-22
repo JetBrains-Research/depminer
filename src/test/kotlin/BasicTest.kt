@@ -1,8 +1,5 @@
 import org.jetbrains.research.depminer.actions.getProjectDependencies
-import org.jetbrains.research.depminer.model.CodeElement
-import org.jetbrains.research.depminer.model.FileRange
-import org.jetbrains.research.depminer.model.LocationInfo
-import org.jetbrains.research.depminer.model.ProjectScope
+import org.jetbrains.research.depminer.model.*
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Test
@@ -38,27 +35,39 @@ class BasicTest {
         )
     }
 
-    @Test
-    fun `Runner Implementation Executes And Outputs to File`() {
-        val exitCode = runIde(".", ".")
-        assertEquals(0, exitCode, "The IDE should finish with exit code 0")
-        assertEquals(testContent, readTestFile(), "Content of the output should match the expected")
-    }
-
-    @Test
-    fun `Dependency Between Two Files Detected - Kotlin Idea Project`() {
-        val testInputPath = "src/test/resources/testProjects/kotlinIdea"
-        val exitCode = runIde(testInputPath, ".")
-        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
-//        Assert.assertFalse("Dependencies list should not be empty",dependencies.isEmpty())
-//        Assert.assertTrue("Main.kt should depend on Util.kt",
-//            dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
-    }
+//    @Test
+//    fun `Runner Implementation Executes And Outputs to File`() {
+//        val exitCode = runIde(".", ".")
+//        assertEquals(0, exitCode, "The IDE should finish with exit code 0")
+//        assertEquals(testContent, readTestFile(), "Content of the output should match the expected")
+//    }
 
     @Test
     fun `Java Test Project Runs`() {
         val testInputPath = "src/test/resources/testProjects/javaTestProject"
         val exitCode = runIde(testInputPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+    }
+
+    @Test
+    fun `Dependency Between Two Files Detected - Java Test Project` () {
+        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        val exitCode = runIde(testInputPath, ".")
+        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+        Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
+        val dependencies = readFromJsonString(readTestFile())
+        Assert.assertTrue("Main.java should depend on Util.java",
+            dependencies.any { it.from.isInFile("Main.java") && it.to.isInFile("Util.java") })
+    }
+
+    @Test
+    fun `Dependency Between Two Files Detected - kotlin Idea Project` () {
+        val testInputPath = "src/test/resources/testProjects/kotlinIdea"
+        val exitCode = runIde(testInputPath, ".")
+        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+        Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
+        val dependencies = readFromJsonString(readTestFile())
+        Assert.assertTrue("Main.kt should depend on Util.kt",
+            dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
     }
 }

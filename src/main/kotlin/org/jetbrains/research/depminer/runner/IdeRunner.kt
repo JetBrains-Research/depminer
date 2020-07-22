@@ -2,6 +2,7 @@ import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationStarter
 import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.Dependency
+import org.jetbrains.research.depminer.model.convertToJsonString
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -19,8 +20,6 @@ class IdeRunner : ApplicationStarter {
     override fun getCommandName(): String = "mine-dependencies"
 
     override fun main(args: Array<out String>) {
-
-        val dependencies = mutableListOf<Dependency>()
 
         if (args.size != 3) {
             println("Incorrect number of arguments: " + args.size + " found, 3 expected")
@@ -43,7 +42,7 @@ class IdeRunner : ApplicationStarter {
 
         val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
 
-        outputDir.resolve(testOutput).writeText(dependencies.toString())
+        outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
         exitProcess(0)
     }
 }

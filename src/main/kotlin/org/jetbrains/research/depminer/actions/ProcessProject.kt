@@ -48,12 +48,12 @@ private fun findDependenciesInList(psiFiles: Collection<PsiFile>): Collection<De
 private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
     val dependenciesMap = mutableListOf<Dependency>()
     val references = psiElement.references
-    println("This elements reference: ${references.toString()}")
     for (ref in references) {
+        println("Element reference: $ref")
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
             println("And it resolves to: ${elementDeclaration.toString()}")
-            if (elementDeclaration.containingFile != null) {
+            if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null) {
                 val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
                 val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
                 val currentDependency = Dependency(ConnectionType.UNKNOWN, codeElement, codeElementDeclaration)
