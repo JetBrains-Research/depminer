@@ -36,7 +36,6 @@ private fun findDependenciesInList(psiFiles: Collection<PsiFile>): Collection<De
         element.accept(object: PsiRecursiveElementVisitor()
         {
             override fun visitElement(element: PsiElement) {
-                println("Inspecting element: ${element.toString()}")
                 dependenciesMap.addAll(visitPsiElement(element))
                 super.visitElement(element)
             }
@@ -49,6 +48,7 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
     val dependenciesMap = mutableListOf<Dependency>()
     val references = psiElement.references
     for (ref in references) {
+        println("Inspecting element: $psiElement")
         println("Element reference: $ref")
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {

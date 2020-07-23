@@ -1,4 +1,23 @@
+import org.jetbrains.research.depminer.model.CodeElement
+import org.jetbrains.research.depminer.model.LocationInfo
 import java.io.File
+
+/**
+ * Checks if locationInfo is in file [fileName]
+ *
+ * @param fileName:
+ */
+fun LocationInfo.isInFile(fileName: String): Boolean {
+    return path.endsWith(fileName)
+}
+
+/**
+ * Checks if the code element is in given file [fileName]
+ */
+fun CodeElement.isInFile(fileName: String): Boolean {
+    return location.isInFile(fileName)
+}
+
 
 /**
  * Executes extract-dependencies shell script

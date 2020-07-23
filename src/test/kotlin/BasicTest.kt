@@ -5,13 +5,6 @@ import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
 
-fun LocationInfo.isInFile(fileName: String): Boolean {
-    return path.endsWith(fileName)
-}
-
-fun CodeElement.isInFile(fileName: String): Boolean {
-    return location.isInFile(fileName)
-}
 
 class BasicTest {
     companion object {
@@ -52,12 +45,21 @@ class BasicTest {
     @Test
     fun `Dependency Between Two Files Detected - Java Test Project` () {
         val testInputPath = "src/test/resources/testProjects/javaTestProject"
-        val exitCode = runIde(testInputPath, ".")
-        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+        runIde(testInputPath, ".")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
         Assert.assertTrue("Main.java should depend on Util.java",
             dependencies.any { it.from.isInFile("Main.java") && it.to.isInFile("Util.java") })
+    }
+
+    @Test
+    fun `Dependency Within One File Detected - Java Test Project` () {
+        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        runIde(testInputPath, ".")
+        Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
+        val dependencies = readFromJsonString(readTestFile())
+        val innerDependencies = dependencies.filter { it.from.location.path == it.to.location.path }
+        Assert.assertFalse("List has dependencies within one file", innerDependencies.isEmpty())
     }
 
     @Test
@@ -68,6 +70,6 @@ class BasicTest {
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
         Assert.assertTrue("Main.kt should depend on Util.kt",
-            dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
+                dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
     }
 }
