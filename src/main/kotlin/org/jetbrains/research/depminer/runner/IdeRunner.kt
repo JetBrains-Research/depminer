@@ -15,26 +15,26 @@ const val testContent = "test"
 
 class IdeRunner : ApplicationStarter {
 
-    val projectPath = System.getProperty("user.dir")
+    private val projectPath: String = System.getProperty("user.dir")
 
     override fun getCommandName(): String = "mine-dependencies"
 
     override fun main(args: Array<out String>) {
 
-        if (args.size != 3) {
-            println("Incorrect number of arguments: " + args.size + " found, 3 expected")
-            exitProcess(0)
-        }
+        // Arguments number check isn't necessary and is performed by a system
 
         println("IDEA instance started. . . ")
         val inputDir = File(projectPath).resolve(args[1])
-        println(inputDir.absolutePath)
+        println(inputDir.absolutePath) //Debug
+
         val outputDir = File(projectPath).resolve(args[2])
-        println(outputDir.absolutePath)
+        println(outputDir.absolutePath) //Debug
+
         val project = ProjectUtil.openOrImport(inputDir.absolutePath, null, true)
 
         if (project == null) {
             println("Could not load project from $inputDir")
+            outputDir.resolve(testOutput).writeText("Could not load the project from $inputDir")
             exitProcess(0)
         }
 

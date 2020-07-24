@@ -53,7 +53,8 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
             println("And it resolves to: ${elementDeclaration.toString()}")
-            if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null) {
+Minor             if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null)
+            {
                 val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
                 val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, FileRange(null, null)), ElementType.UNKNOWN)
                 val currentDependency = Dependency(ConnectionType.UNKNOWN, codeElement, codeElementDeclaration)

@@ -7,8 +7,8 @@ import java.io.File
  * Describes a connection type between two elements [CodeElement] in the [Dependency] class
  */
 enum class ConnectionType {
-    USAGE, // "from" is declared in "to"
-    UNKNOWN  // going to use this for now
+    USAGE, // "from" - usage, "to" - declaration of the element
+    FILE_DEPENDENCY // "from" file uses "to" file data
 }
 
 /**
@@ -19,7 +19,7 @@ enum class ElementType {
     CLASS,
     FUNCTION,
     LINE,
-    UNKNOWN
+    FIELD
 }
 
 /**
