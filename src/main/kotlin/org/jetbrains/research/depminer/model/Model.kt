@@ -1,5 +1,7 @@
 package org.jetbrains.research.depminer.model
 
+import com.intellij.psi.*
+import org.jetbrains.kotlin.resolve.calls.callResolverUtil.replaceReturnTypeByUnknown
 import java.io.File
 
 
@@ -15,11 +17,22 @@ enum class ConnectionType {
  * Describes a [CodeElement] type
  */
 enum class ElementType {
+    UNDEFINED, // For null safety for now
     FILE,
     CLASS,
     FUNCTION,
-    LINE,
+    LINE, // How do we need this?
     FIELD
+}
+
+fun determineElementType(psiElement: PsiElement): ElementType {
+    return when (psiElement) {
+        is PsiClass -> ElementType.CLASS
+        is PsiMethod -> ElementType.FUNCTION
+        is PsiField -> ElementType.FIELD
+        is PsiFile -> ElementType.FILE
+        else -> ElementType.UNDEFINED
+    }
 }
 
 /**
