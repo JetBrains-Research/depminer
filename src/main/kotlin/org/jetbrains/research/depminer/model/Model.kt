@@ -28,6 +28,10 @@ enum class ElementType {
 
 /**
  * Determines and returns a [psiElement] type
+ *
+ * @param psiElement an element to inspect
+ *
+ * @return [ElementType]
  */
 fun determineElementType(psiElement: PsiElement): ElementType {
     return when (psiElement) {
@@ -42,6 +46,9 @@ fun determineElementType(psiElement: PsiElement): ElementType {
     }
 }
 
+/**
+ * Checks if a PsiElement has a parent of type PsiMethodCallExpression
+ */
 private fun PsiElement.hasParentMethodCall(): Boolean {
     return if (this.parent != null) {
         if (this.parent is PsiMethodCallExpression) {
