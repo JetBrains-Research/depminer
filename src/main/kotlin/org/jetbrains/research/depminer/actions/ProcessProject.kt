@@ -3,9 +3,10 @@ package org.jetbrains.research.depminer.actions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.*
+import com.intellij.refactoring.suggested.endOffset
+import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
-import kotlin.collections.emptyList as emptyList
 
 fun getProjectDependencies(projectPath: String, project: Project): Collection<Dependency> {
     return getDependencies(ProjectScope(projectPath), project)
@@ -55,8 +56,10 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
             println("And it resolves to: ${elementDeclaration.toString()}")
              if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null)
             {
-                val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, FileRange(null, null)), ElementType.FIELD)
-                val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, FileRange(null, null)), ElementType.FIELD)
+                val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
+                val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), ElementType.FIELD)
+                val toElementRange = FileRange(elementDeclaration.startOffset, elementDeclaration.endOffset)
+                val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), ElementType.FIELD)
                 val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration)
                 dependenciesMap.add(currentDependency)
             }

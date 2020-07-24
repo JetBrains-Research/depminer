@@ -33,10 +33,10 @@ data class FileLocation(val line: Int, val offset: Int)
 /**
  * Data class representing a region of the file
  *
- * @property start
- * @property end
+ * @property start offset
+ * @property end offset
  */
-data class FileRange(val start: FileLocation?, val end: FileLocation?)
+data class FileRange(val start: Int?, val end: Int?)
 
 /**
  * Full description of code element location in file system
