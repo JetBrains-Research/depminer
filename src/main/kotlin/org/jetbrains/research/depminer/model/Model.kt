@@ -1,6 +1,7 @@
 package org.jetbrains.research.depminer.model
 
 import com.intellij.psi.*
+import com.intellij.psi.util.parents
 import org.jetbrains.kotlin.resolve.calls.callResolverUtil.replaceReturnTypeByUnknown
 import java.io.File
 
@@ -25,14 +26,30 @@ enum class ElementType {
     FIELD
 }
 
+/**
+ * Determines and returns a [psiElement] type
+ */
 fun determineElementType(psiElement: PsiElement): ElementType {
     return when (psiElement) {
         is PsiClass -> ElementType.CLASS
         is PsiMethod -> ElementType.FUNCTION
         is PsiField -> ElementType.FIELD
         is PsiFile -> ElementType.FILE
+        is PsiReferenceExpression -> {
+            if (psiElement.hasParentMethodCall()) ElementType.FUNCTION else ElementType.UNDEFINED
+        }
         else -> ElementType.UNDEFINED
     }
+}
+
+private fun PsiElement.hasParentMethodCall(): Boolean {
+    return if (this.parent != null) {
+        if (this.parent is PsiMethodCallExpression) {
+            true
+        } else {
+            this.parent.hasParentMethodCall()
+        }
+    } else false
 }
 
 /**
