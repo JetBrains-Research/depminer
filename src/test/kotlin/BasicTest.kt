@@ -27,13 +27,6 @@ class BasicTest {
         )
     }
 
-//    @Test
-//    fun `Runner Implementation Executes And Outputs to File`() {
-//        val exitCode = runIde(".", ".")
-//        assertEquals(0, exitCode, "The IDE should finish with exit code 0")
-//        assertEquals(testContent, readTestFile(), "Content of the output should match the expected")
-//    }
-
     @Test
     fun `Java Test Project Runs`() {
         val testInputPath = "/testData/testProjects/javaTestProject"

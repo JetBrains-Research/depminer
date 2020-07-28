@@ -1,5 +1,7 @@
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationStarter
+import com.intellij.openapi.roots.ProjectRootManager
+import com.intellij.openapi.vfs.VfsUtilCore
 import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.convertToJsonString
@@ -38,6 +40,14 @@ class IdeRunner : ApplicationStarter {
             println("Could not load project from $inputDir")
             outputDir.resolve(testOutput).writeText("Could not load the project from $inputDir")
             exitProcess(0)
+        }
+
+        ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
+            VfsUtilCore.iterateChildrenRecursively(root, null) {
+                println("Virtual file: $it")
+                true
+            }
+            println("Project root: $root")
         }
 
         println("Successfully opened project at inputDir: $project")
