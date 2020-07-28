@@ -5,6 +5,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.convertToJsonString
+import org.jetbrains.research.depminer.runner.projectSetup
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -32,25 +33,7 @@ class IdeRunner : ApplicationStarter {
         val outputDir = File(projectPath).resolve(args[2])
         println(outputDir.absolutePath) //Debug
 
-        println("Starting project search")
-        val project = ProjectUtil.openOrImport(inputDir.absolutePath, null, true)
-        println("Project loaded")
-
-        if (project == null) {
-            println("Could not load project from $inputDir")
-            outputDir.resolve(testOutput).writeText("Could not load the project from $inputDir")
-            exitProcess(0)
-        }
-
-        ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
-            VfsUtilCore.iterateChildrenRecursively(root, null) {
-                println("Virtual file: $it")
-                true
-            }
-            println("Project root: $root")
-        }
-
-        println("Successfully opened project at inputDir: $project")
+        val project = projectSetup(inputDir, outputDir)
 
         val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
 
