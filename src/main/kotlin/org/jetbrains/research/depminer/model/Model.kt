@@ -22,8 +22,8 @@ enum class ElementType {
     FILE,
     CLASS,
     FUNCTION,
-    LINE, // How do we need this?
-    FIELD
+    FIELD,
+    OBJECT
 }
 
 /**
@@ -120,7 +120,7 @@ class ProjectScope(val path: String): AnalysisScope {
         val analysisScope = mutableListOf<LocationInfo>()
         File(path).walk().forEach {
             if (it.isFile) {
-                 if (!it.absolutePath.contains(".idea")) {
+                 if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
                      // Excluding .idea folder files for now
                      analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
                  }

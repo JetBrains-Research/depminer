@@ -30,7 +30,9 @@ class IdeRunner : ApplicationStarter {
         val outputDir = File(projectPath).resolve(args[2])
         println(outputDir.absolutePath) //Debug
 
+        println("Starting project search")
         val project = ProjectUtil.openOrImport(inputDir.absolutePath, null, true)
+        println("Project loaded")
 
         if (project == null) {
             println("Could not load project from $inputDir")

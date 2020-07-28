@@ -1,4 +1,3 @@
-import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.*
 import org.junit.AfterClass
 import org.junit.Assert
@@ -18,10 +17,10 @@ class BasicTest {
     @Test
     fun `Project Scope is Derived From Project Path Correctly`() {
         val projectPath = System.getProperty("user.dir")
-        val projectScope = ProjectScope("$projectPath/src/test/resources/testProjects/kotlinIdea")
+        val projectScope = ProjectScope("$projectPath/testData/testProjects/kotlinIdea")
         val desiredProjectScope = listOf(
-            LocationInfo("$projectPath/src/test/resources/testProjects/kotlinIdea/src/Main.kt", FileRange(null, null)),
-            LocationInfo("$projectPath/src/test/resources/testProjects/kotlinIdea/src/Util.kt", FileRange(null, null)))
+            LocationInfo("$projectPath/testData/testProjects/kotlinIdea/src/Main.kt", FileRange(null, null)),
+            LocationInfo("$projectPath/testData/testProjects/kotlinIdea/src/Util.kt", FileRange(null, null)))
         Assert.assertTrue(
             "Two kotlin files found: Main.kt and Util.kt",
             projectScope.getLocations() == desiredProjectScope
@@ -37,14 +36,14 @@ class BasicTest {
 
     @Test
     fun `Java Test Project Runs`() {
-        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        val testInputPath = "/testData/testProjects/javaTestProject"
         val exitCode = runIde(testInputPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
     }
 
     @Test
     fun `Dependency Between Two Files Detected - Java Test Project` () {
-        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        val testInputPath = "/testData/testProjects/javaTestProject"
         runIde(testInputPath, ".")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
@@ -54,7 +53,7 @@ class BasicTest {
 
     @Test
     fun `Dependency Within One File Detected - Java Test Project` () {
-        val testInputPath = "src/test/resources/testProjects/javaTestProject"
+        val testInputPath = "/testData/testProjects/javaTestProject"
         runIde(testInputPath, ".")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
@@ -63,13 +62,25 @@ class BasicTest {
     }
 
     @Test
-    fun `Dependency Between Two Files Detected - Kotlin Idea Project` () {
-        val testInputPath = "src/test/resources/testProjects/kotlinIdea"
+    fun `Dependency Between Two Files Detected - Kotlin Test Project` () {
+        val testInputPath = "testData/testProjects/kotlinTestProject"
+        val exitCode = runIde(testInputPath, ".")
+        assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
+        Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
+        println(readTestFile())
+        val dependencies = readFromJsonString(readTestFile())
+        Assert.assertTrue("Main.kt should depend on Utility.kt",
+                dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Utility.kt") })
+    }
+
+    @Test
+    fun `Dependency Within One File Detected - Kotlin Test Project` () {
+        val testInputPath = "testData/testProjects/kotlinTestProject"
         val exitCode = runIde(testInputPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
-        Assert.assertTrue("Main.kt should depend on Util.kt",
-                dependencies.any { it.from.isInFile("Main.kt") && it.to.isInFile("Util.kt") })
+        val innerDependencies = dependencies.filter { it.from.location.path == it.to.location.path }
+        Assert.assertFalse("List has dependencies within one file", innerDependencies.isEmpty())
     }
 }
