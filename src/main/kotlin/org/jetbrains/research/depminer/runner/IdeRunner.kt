@@ -1,4 +1,5 @@
 import com.intellij.ide.impl.ProjectUtil
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationStarter
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
@@ -25,6 +26,8 @@ class IdeRunner : ApplicationStarter {
     override fun main(args: Array<out String>) {
 
         // Arguments number check isn't necessary and is performed by a system
+
+        val application = ApplicationManager.getApplication()
 
         println("IDEA instance started. . . ")
         val inputDir = File(projectPath).resolve(args[1])

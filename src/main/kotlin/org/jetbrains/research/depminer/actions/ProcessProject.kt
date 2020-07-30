@@ -12,11 +12,6 @@ fun getProjectDependencies(projectPath: String, project: Project): Collection<De
     return getDependencies(ProjectScope(projectPath), project)
 }
 
-fun getFileDependencies(filePath: String, project: Project): Collection<Dependency> {
-    TODO("Implement FileScope approach")
-    return getDependencies(FileScope(filePath), project)
-}
-
 private fun getDependencies(scope: AnalysisScope, project: Project): Collection<Dependency> {
     val psiFiles = mutableListOf<PsiFile>()
     for (element in scope.getLocations()) {

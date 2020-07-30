@@ -36,7 +36,7 @@ tasks {
         val dataset: String? by project
         val output: String? by project
         args = listOfNotNull("mine-dependencies", dataset, output)
-        jvmArgs = listOf("-Djava.awt.headless=true") // Provides an intellij instance access under the hood
+        // jvmArgs = listOf("-Djava.awt.headless=true") // Provides an intellij instance access under the hood
     }
 
     register("extractDependencies") {
