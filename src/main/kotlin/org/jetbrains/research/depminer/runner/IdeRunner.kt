@@ -1,6 +1,7 @@
 import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationStarter
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import org.jetbrains.research.depminer.actions.getProjectDependencies
@@ -38,9 +39,13 @@ class IdeRunner : ApplicationStarter {
 
         val project = projectSetup(inputDir, outputDir)
 
-        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
 
-        outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
+        DumbService.getInstance(project).runWhenSmart {
+            println("Smart mode on")
+            val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
+            outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
+        }
+
         exitProcess(0)
     }
 }
