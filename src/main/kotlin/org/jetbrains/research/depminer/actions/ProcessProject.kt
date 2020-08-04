@@ -8,6 +8,8 @@ import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
+val bannedSuffixes = listOf<String>("png", "png\"")
+
 fun getProjectDependencies(projectPath: String, project: Project): Collection<Dependency> {
     return getDependencies(ProjectScope(projectPath), project)
 }
@@ -50,18 +52,21 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
         if (elementDeclaration != null) {
             println("And it resolves to: ${elementDeclaration.toString()}")
              if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null) {
-                val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
-                val fromElementType = determineElementType(psiElement)
-                val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), fromElementType)
+
+                 if (elementDeclaration.text != null && !bannedSuffixes.any {it in psiElement.text}) {
+                     val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
+                     val fromElementType = determineElementType(psiElement)
+                     val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), fromElementType)
 
 
-                val toElementRange = FileRange(elementDeclaration.startOffset, elementDeclaration.endOffset)
-                val toElementType = determineElementType(elementDeclaration)
-                val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), toElementType)
+                     val toElementRange = FileRange(elementDeclaration.startOffset, elementDeclaration.endOffset)
+                     val toElementType = determineElementType(elementDeclaration)
+                     val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), toElementType)
 
-                val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration)
-                dependenciesMap.add(currentDependency)
-            }
+                     val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration)
+                     dependenciesMap.add(currentDependency)
+                 }
+             }
         }
     }
     return dependenciesMap

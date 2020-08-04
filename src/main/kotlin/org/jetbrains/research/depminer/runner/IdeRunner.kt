@@ -30,7 +30,7 @@ class IdeRunner : ApplicationStarter {
 
         val application = ApplicationManager.getApplication()
 
-        println("IDEA instance started. . . ")
+        println("IDEA instance started. . . \n")
         val inputDir = File(projectPath).resolve(args[1])
         println(inputDir.absolutePath) //Debug
 
@@ -41,7 +41,7 @@ class IdeRunner : ApplicationStarter {
 
 
         DumbService.getInstance(project).runWhenSmart {
-            println("Smart mode on")
+            println("Indexing finished")
             val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
             outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
         }
