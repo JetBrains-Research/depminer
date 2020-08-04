@@ -24,14 +24,27 @@ import kotlin.system.exitProcess
 
 
 fun projectSetup(inputDir: File, outputDir: File): Project {
-
     val project = loadProject(inputDir.absolutePath, outputDir)
-    println("Successfully opened project at inputDir: $project")
+    println("Successfully opened project at inputDir: $project \n")
+    val projectVirtualFiles = getProjectFiles(project)
+    return if (projectVirtualFiles.any() {it.path.endsWith(".iml")}) {
+        project
+    } else {
+        println("Project setup debug info:")
+        visitProjectFiles(project)
+        project
+    }
+}
 
-    println("Project setup debug info:")
-    visitProjectFiles(project)
-
-    return project
+fun getProjectFiles(project: Project): Collection<VirtualFile> {
+    val virtualFiles = mutableListOf<VirtualFile>()
+    ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
+        VfsUtilCore.iterateChildrenRecursively(root, null) {
+            virtualFiles.add(it)
+            true
+        }
+    }
+    return virtualFiles
 }
 
 fun visitProjectFiles(project: Project) {
