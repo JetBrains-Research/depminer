@@ -8,8 +8,6 @@ import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
-val bannedSuffixes = listOf<String>("png", "png\"")
-
 fun getProjectDependencies(projectPath: String, project: Project): Collection<Dependency> {
     return getDependencies(ProjectScope(projectPath), project)
 }
@@ -53,7 +51,7 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
             println("And it resolves to: ${elementDeclaration.toString()}")
              if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null) {
 
-                 if (elementDeclaration.text != null && !bannedSuffixes.any {it in psiElement.text}) {
+                 if (elementDeclaration.textRange != null && psiElement.textRange != null) {
                      val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
                      val fromElementType = determineElementType(psiElement)
                      val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), fromElementType)
