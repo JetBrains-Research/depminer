@@ -22,7 +22,7 @@ import java.io.File
 import java.lang.System.getenv
 import kotlin.system.exitProcess
 
-fun projectSetup(inputDir: File, outputDir: File): Project {
+fun projectSetup(inputDir: File, sourceRootDir: File, outputDir: File): Project {
     val project = loadProject(inputDir.absolutePath, outputDir)
     println("Successfully opened project at inputDir: $project \n")
     val projectVirtualFiles = getProjectFiles(project)
@@ -30,7 +30,7 @@ fun projectSetup(inputDir: File, outputDir: File): Project {
         project
     } else {
         println("Project setup debug info:")
-        visitProjectFiles(project)
+        visitProjectFiles(project, sourceRootDir)
         project
     }
 }
@@ -46,13 +46,13 @@ fun getProjectFiles(project: Project): Collection<VirtualFile> {
     return virtualFiles
 }
 
-fun visitProjectFiles(project: Project) {
+fun visitProjectFiles(project: Project, sourceRootDir: File) {
     var sourceRootSet = false
     ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
         println("Project root: $root")
         VfsUtilCore.iterateChildrenRecursively(root, null) { it ->
             println("Virtual file: $it")
-            if (it.path.endsWith("/src") && !sourceRootSet) {
+            if (it.path.endsWith(sourceRootDir.path) && !sourceRootSet) {
                 sourceRootSet = true
                 println("Source root: $it")
                 setSourceRootForSingleModule(project, it)

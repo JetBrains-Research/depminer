@@ -34,9 +34,10 @@ tasks {
 
     runIde {
         val dataset: String? by project
+        val source: String? by project
         val output: String? by project
-        args = listOfNotNull("mine-dependencies", dataset, output)
-        jvmArgs = listOf("-Djava.awt.headless=true") // Provides an intellij instance access under the hood
+        args = listOfNotNull("mine-dependencies", dataset, source, output)
+        jvmArgs = listOf("-Djava.awt.headless=true")
     }
 
     register("extractDependencies") {

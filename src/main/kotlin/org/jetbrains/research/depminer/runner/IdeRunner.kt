@@ -26,18 +26,19 @@ class IdeRunner : ApplicationStarter {
 
     override fun main(args: Array<out String>) {
 
-        // Arguments number check isn't necessary and is performed by a system
-
-        val application = ApplicationManager.getApplication()
+        // Arguments number check isn't necessary and is handled in extract-dependencies.sh
 
         println("IDEA instance started. . . \n")
         val inputDir = File(projectPath).resolve(args[1])
         println(inputDir.absolutePath) //Debug
 
-        val outputDir = File(projectPath).resolve(args[2])
+        val sourceRootDir = File(projectPath).resolve(args[2])
+        println(sourceRootDir.absolutePath)
+
+        val outputDir = File(projectPath).resolve(args[3])
         println(outputDir.absolutePath) //Debug
 
-        val project = projectSetup(inputDir, outputDir)
+        val project = projectSetup(inputDir, sourceRootDir, outputDir)
 
 
         DumbService.getInstance(project).runWhenSmart {
