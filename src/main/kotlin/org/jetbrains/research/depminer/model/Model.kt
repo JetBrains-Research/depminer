@@ -1,8 +1,6 @@
 package org.jetbrains.research.depminer.model
 
 import com.intellij.psi.*
-import com.intellij.psi.util.parents
-import org.jetbrains.kotlin.resolve.calls.callResolverUtil.replaceReturnTypeByUnknown
 import java.io.File
 
 
@@ -59,13 +57,17 @@ private fun PsiElement.hasParentMethodCall(): Boolean {
     } else false
 }
 
-/**
- * Structure representing a location (coordinate) in certain file
- *
- * @property line
- * @property offset IntelliJ SDK platform defined offset
- */
-data class FileLocation(val line: Int, val offset: Int)
+/* ================= Remove? ==================*/
+
+///**
+// * Structure representing a location (coordinate) in certain file
+// *
+// * @property line
+// * @property offset IntelliJ SDK platform defined offset
+// */
+//data class FileLocation(val line: Int, val offset: Int)
+
+/* ================= Remove? ==================*/
 
 /**
  * Data class representing a region of the file
@@ -96,7 +98,7 @@ data class LocationInfo(val path: String, val range: FileRange): AnalysisScope {
 data class CodeElement(val location: LocationInfo, val type: ElementType)
 
 /**
- * Data class describing a dependency betwwen two Code Elements
+ * Data class describing a dependency between two Code Elements
  *
  * @property ConnectionType connection type between two elements
  * @property from 1/2 [CodeElement]
@@ -109,13 +111,17 @@ interface AnalysisScope {
     fun getLocations(): List<LocationInfo>
 }
 
-class FileScope(val path: String): AnalysisScope {
-    override fun getLocations(): List<LocationInfo> {
-        return listOf(LocationInfo(path, FileRange(null, null)))
-    }
-}
+/* ================= Remove? ==================*/
 
-class ProjectScope(val path: String): AnalysisScope {
+//class FileScope(private val path: String): AnalysisScope {
+//    override fun getLocations(): List<LocationInfo> {
+//        return listOf(LocationInfo(path, FileRange(null, null)))
+//    }
+//}
+
+/* ================= Remove? ==================*/
+
+class ProjectScope(private val path: String): AnalysisScope {
     override fun getLocations(): List<LocationInfo> {
         val analysisScope = mutableListOf<LocationInfo>()
         File(path).walk().forEach {
