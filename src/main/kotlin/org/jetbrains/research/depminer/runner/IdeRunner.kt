@@ -2,6 +2,7 @@ import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationStarter
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.vfs.VfsUtilCore
 import org.jetbrains.research.depminer.actions.getProjectDependencies
@@ -40,13 +41,22 @@ class IdeRunner : ApplicationStarter {
 
         val project = projectSetup(inputDir, sourceRootDir, outputDir)
 
+        val dumbService= DumbService.getInstance(project)
 
-        DumbService.getInstance(project).runWhenSmart {
-            println("Indexing finished")
-            val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
-            outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
+        println(dumbService.isDumb)
+
+        if (!dumbService.isDumb) {
+            runWhenSmart(inputDir, outputDir, project)
+        } else dumbService.runWhenSmart{
+            runWhenSmart(inputDir, outputDir, project)
         }
 
         exitProcess(0)
+    }
+
+    private fun runWhenSmart(inputDir: File, outputDir: File, project: Project) {
+        println("Indexing finished")
+        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
+        outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
     }
 }
