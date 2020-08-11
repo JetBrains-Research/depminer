@@ -32,6 +32,7 @@ enum class ElementType {
  * @return [ElementType]
  */
 fun determineElementType(psiElement: PsiElement): ElementType {
+    TODO("Get rid of java-based logic - universal logic for supported languages required")
     return when (psiElement) {
         is PsiClass -> ElementType.CLASS
         is PsiMethod -> ElementType.FUNCTION

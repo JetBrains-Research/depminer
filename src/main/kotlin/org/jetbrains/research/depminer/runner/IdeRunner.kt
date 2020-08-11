@@ -1,12 +1,7 @@
-import com.intellij.ide.impl.ProjectUtil
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ApplicationStarter
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectRootManager
-import com.intellij.openapi.vfs.VfsUtilCore
 import org.jetbrains.research.depminer.actions.getProjectDependencies
-import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.convertToJsonString
 import org.jetbrains.research.depminer.runner.projectSetup
 import java.io.File
@@ -42,8 +37,6 @@ class IdeRunner : ApplicationStarter {
         val project = projectSetup(inputDir, sourceRootDir, outputDir)
 
         val dumbService= DumbService.getInstance(project)
-
-        println(dumbService.isDumb)
 
         if (!dumbService.isDumb) {
             runWhenSmart(inputDir, outputDir, project)
