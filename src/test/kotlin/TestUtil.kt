@@ -27,8 +27,8 @@ fun CodeElement.isInFile(fileName: String): Boolean {
  *
  * @return launched process' return code
  */
-fun runIde(inputDir: String, outputDir: String): Int {
-    val command = "./extract-dependencies.sh $inputDir $outputDir"
+fun runIde(inputDir: String, sourceDir: String, outputDir: String): Int {
+    val command = "./extract-dependencies.sh $inputDir $sourceDir $outputDir"
     val process = Runtime.getRuntime().exec(command)
     return process.waitFor()
 }

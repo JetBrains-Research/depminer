@@ -17,7 +17,8 @@ class BasicTest {
     @Test
     fun `Null Safety In Project Setup`() {
         val testInputPath = "/testData/testProjects/NoSuchProject"
-        val exitCode = runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/NoSuchProject/src/"
+        val exitCode = runIde(testInputPath, testSrcPath, ".")
         Assert.assertNotEquals("IDE finished with non zero code", 0, exitCode)
     }
     
@@ -37,14 +38,16 @@ class BasicTest {
     @Test
     fun `Java Test Project Runs`() {
         val testInputPath = "/testData/testProjects/javaTestProject"
-        val exitCode = runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/javaTestProject/src/"
+        val exitCode = runIde(testInputPath, testSrcPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
     }
 
     @Test
     fun `Dependency Between Two Files Detected - Java Test Project` () {
         val testInputPath = "/testData/testProjects/javaTestProject"
-        runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/javaTestProject/src/"
+        runIde(testInputPath, testSrcPath, ".")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
         Assert.assertTrue("Main.java should depend on Util.java",
@@ -54,7 +57,8 @@ class BasicTest {
     @Test
     fun `Dependency Within One File Detected - Java Test Project` () {
         val testInputPath = "/testData/testProjects/javaTestProject"
-        runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/javaTestProject/src/"
+        runIde(testInputPath, testSrcPath, ".")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
         val innerDependencies = dependencies.filter { it.from.location.path == it.to.location.path }
@@ -64,7 +68,8 @@ class BasicTest {
     @Test
     fun `Dependency Between Two Files Detected - Kotlin Test Project` () {
         val testInputPath = "testData/testProjects/kotlinTestProject"
-        val exitCode = runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/kotlinTestProject/src/"
+        val exitCode = runIde(testInputPath, testSrcPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         println(readTestFile())
@@ -76,7 +81,8 @@ class BasicTest {
     @Test
     fun `Dependency Within One File Detected - Kotlin Test Project` () {
         val testInputPath = "testData/testProjects/kotlinTestProject"
-        val exitCode = runIde(testInputPath, ".")
+        val testSrcPath = "/testData/testProjects/kotlinTestProject/src/"
+        val exitCode = runIde(testInputPath, testSrcPath, ".")
         assertEquals(0, exitCode, "The IDE should finish terminate with code 0")
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readFromJsonString(readTestFile())
