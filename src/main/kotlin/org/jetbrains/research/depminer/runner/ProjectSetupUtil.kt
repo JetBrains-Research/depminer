@@ -95,14 +95,6 @@ fun getContentRootFor(url: VirtualFile?, rootModel: ModifiableRootModel): Conten
     return null
 }
 
-//fun setupKotlinSDK(project: Project): Project {
-//    val sdk = JavaSdk.getInstance().createJdk("openjdk", getenv("JAVA_HOME")!!, true)
-//    ProjectJdkTable.getInstance().addJdk(sdk)
-//    ProjectRootManager.getInstance(project).projectSdk = sdk
-//    NewProjectUtil.applyJdkToProject(project, sdk)
-//    return project
-//}
-
 fun loadProject(path: String, outputDir: File): Project {
     println("Starting project search at path: $path")
     val project = ProjectUtil.openOrImport(path , null, true)
