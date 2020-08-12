@@ -15,6 +15,7 @@ enum class ConnectionType {
 /**
  * Describes a [CodeElement] type
  */
+@Deprecated("Language specific logic - unused")
 enum class ElementType {
     UNDEFINED, // For null safety for now
     FILE,
@@ -31,6 +32,7 @@ enum class ElementType {
  *
  * @return [ElementType]
  */
+@Deprecated("Language specific logic - unused")
 fun determineElementType(psiElement: PsiElement): ElementType {
     return when (psiElement) {
         is PsiClass -> ElementType.CLASS
@@ -47,6 +49,7 @@ fun determineElementType(psiElement: PsiElement): ElementType {
 /**
  * Checks if a PsiElement has a parent of type PsiMethodCallExpression
  */
+@Deprecated("Language specific logic - unused")
 private fun PsiElement.hasParentMethodCall(): Boolean {
     return if (this.parent != null) {
         if (this.parent is PsiMethodCallExpression) {
@@ -93,7 +96,7 @@ data class LocationInfo(val path: String, val range: FileRange): AnalysisScope {
  * Data class representing a code element that can form a dependency (field, function/method, class etc)
  *
  * @property location A [LocationInfo] instance containing information about element location on disk
- * @property type [ElementType] of the given code element
+ * @property typeSignature [ElementType] of the given code element
  */
 data class CodeElement(val location: LocationInfo, val typeSignature: String)
 
