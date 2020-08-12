@@ -48,23 +48,26 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
         println("Element reference: $ref")
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
-            println("And it resolves to: ${elementDeclaration.toString()}")
+            println("And it resolves to: ${elementDeclaration.toString()} \n")
              if (elementDeclaration.containingFile != null && elementDeclaration.containingFile.virtualFile != null) {
 
                  if (elementDeclaration.textRange != null && psiElement.textRange != null) {
                      val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
-                     val fromElementType = determineElementType(psiElement)
+
+                     val fromElementType = psiElement.text.substringBefore(':')
                      val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), fromElementType)
 
 
                      val toElementRange = FileRange(elementDeclaration.startOffset, elementDeclaration.endOffset)
-                     val toElementType = determineElementType(elementDeclaration)
+                     val toElementType = elementDeclaration.text.substringBefore(':')
                      val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), toElementType)
 
                      val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration)
                      dependenciesMap.add(currentDependency)
                  }
              }
+        } else {
+            println()
         }
     }
     return dependenciesMap

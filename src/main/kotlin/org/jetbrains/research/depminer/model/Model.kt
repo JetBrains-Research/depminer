@@ -95,7 +95,7 @@ data class LocationInfo(val path: String, val range: FileRange): AnalysisScope {
  * @property location A [LocationInfo] instance containing information about element location on disk
  * @property type [ElementType] of the given code element
  */
-data class CodeElement(val location: LocationInfo, val type: ElementType)
+data class CodeElement(val location: LocationInfo, val typeSignature: String)
 
 /**
  * Data class describing a dependency between two Code Elements
