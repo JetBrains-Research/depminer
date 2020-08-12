@@ -21,8 +21,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     type = "IU"
-    version = "2020.2"
-    setPlugins("java", "Kotlin", "Pythonid:202.6397.98")
+    version = "2020.1.4"
+    setPlugins("java", "Kotlin", "Pythonid:201.8743.12")
 }
 
 tasks {
