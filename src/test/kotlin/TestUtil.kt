@@ -1,4 +1,5 @@
 import org.jetbrains.research.depminer.model.CodeElement
+import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.LocationInfo
 import java.io.File
 
@@ -18,6 +19,12 @@ fun CodeElement.isInFile(fileName: String): Boolean {
     return location.isInFile(fileName)
 }
 
+/**
+ * Checks if the dependency is between two given files
+ */
+fun Dependency.betweenFiles(fromFileName: String, toFileName: String): Boolean {
+    return (from.location.isInFile(fromFileName) && to.location.isInFile(toFileName)) || (from.location.isInFile(toFileName) && to.location.isInFile(fromFileName))
+}
 
 /**
  * Executes extract-dependencies shell script

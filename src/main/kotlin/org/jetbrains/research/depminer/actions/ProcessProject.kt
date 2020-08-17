@@ -54,15 +54,15 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency> {
                  if (elementDeclaration.textRange != null && psiElement.textRange != null) {
                      val fromElementRange = FileRange(psiElement.startOffset, psiElement.endOffset)
 
-                     val fromElementType = psiElement.text.substringBefore(':')
+                     val fromElementType = ref.toString().substringBefore(':')
                      val codeElement = CodeElement(LocationInfo(psiElement.containingFile.virtualFile.path, fromElementRange), fromElementType)
 
 
                      val toElementRange = FileRange(elementDeclaration.startOffset, elementDeclaration.endOffset)
-                     val toElementType = elementDeclaration.text.substringBefore(':')
+                     val toElementType = elementDeclaration.toString().substringBefore(':')
                      val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), toElementType)
 
-                     val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration)
+                     val currentDependency = Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration) //Usage only? Consider getting rid of
                      dependenciesMap.add(currentDependency)
                  }
              }
