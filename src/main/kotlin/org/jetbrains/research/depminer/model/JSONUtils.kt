@@ -8,6 +8,11 @@ fun convertToJsonString(dependenciesMap: Collection<Dependency>): String {
     return gson.toJson(dependenciesMap)
 }
 
+fun convertSingleDependencyToJSON(dependency: Dependency): String {
+    val gson = Gson()
+    return gson.toJson(dependency)
+}
+
 fun readFromJsonString(jsonString: String): Collection<Dependency> {
     val gson = Gson()
     val collectionDependeciesType = object : TypeToken<Collection<Dependency>>() {}.type

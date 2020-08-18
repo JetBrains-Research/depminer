@@ -15,14 +15,12 @@ class AstminerTest {
 
     @Test
     fun `Astminer-master-dev Dependencies Mining Test`() {
-        val testInputPath = "testData/testProjects/astminer-master-dev"
+        val testInputPath = "testData/testProjects/astminer-master-dev/"
         val testSrcPath = "testData/testProjects/astminer-master-dev/src/"
 
         println("Run IDE:")
         val exitCode = runIde(testInputPath, testSrcPath, ".")
-        println("Terminated fine\n")
         Assert.assertEquals("The IDE should finish terminate with code 0",0, exitCode)
-        println("Asserted true\n")
 
         val consideredFile = "Granularity.kt"
         val targetFiles = listOf("FilterPredicates.kt", "TreeUtil.kt", "ParsingModel.kt", "TreeSplittingModel.kt", "SimpleNode.kt",
