@@ -130,9 +130,9 @@ class ProjectScope(private val path: String): AnalysisScope {
         File(path).walk().forEach {
             if (it.isFile) {
                 if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
-                     // Excluding .idea folder files for now
-                     analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
-                 }
+                    // Excluding .idea folder files for now
+                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+                }
             }
         }
         return analysisScope
