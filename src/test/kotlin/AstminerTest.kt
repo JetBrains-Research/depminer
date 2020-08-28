@@ -1,7 +1,7 @@
-import org.jetbrains.research.depminer.model.readFromJsonString
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Test
+import util.*
 import kotlin.test.assertTrue
 
 class AstminerTest {
@@ -26,7 +26,7 @@ class AstminerTest {
         val targetFiles = listOf("FilterPredicates.kt", "TreeUtil.kt", "ParsingModel.kt", "TreeSplittingModel.kt", "SimpleNode.kt",
                 "JavaMethodSplitter.kt", "PythonMethodSplitter.kt", "FuzzyMethodSplitter.kt", "FuzzyNode.kt", "GumTreeJavaNode.kt", "GumTreeMethodSplitter.kt")
 
-        val dependencies = readFromJsonString(readTestFile())
+        val dependencies = readDependenciesDataFromJsonString(readTestFile())
         val dependenciesGranularityKt = dependencies.filter {it.from.location.isInFile(consideredFile)}
         println(dependenciesGranularityKt)
         for (dependency in dependenciesGranularityKt) {
@@ -46,7 +46,7 @@ class AstminerTest {
         val consideredFile = "ParsingModel.kt"
         val targetFiles = listOf("kotlin.kotlin_builtins", "StandardKt.class", "CollectionsKt.class", "collections.kotlin_builtins", "ConsoleKt.class", "FilesKt.class", "SequencesKt.class", "StringsKt.class")
 
-        val dependencies = readFromJsonString(readTestFile())
+        val dependencies = readDependenciesDataFromJsonString(readTestFile())
         val dependenciesGranularityKt = dependencies.filter {it.from.location.isInFile(consideredFile)}
         println(dependenciesGranularityKt)
         for (dependency in dependenciesGranularityKt) {

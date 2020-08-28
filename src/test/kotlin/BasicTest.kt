@@ -2,7 +2,8 @@ import org.jetbrains.research.depminer.model.*
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Test
-import kotlin.test.assertEquals
+import util.cleanUpTestFiles
+import util.runIde
 
 
 class BasicTest {

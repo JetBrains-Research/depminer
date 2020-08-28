@@ -1,6 +1,11 @@
+package util
+
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.jetbrains.research.depminer.model.CodeElement
 import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.LocationInfo
+import testOutput
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -76,4 +81,11 @@ fun cleanUpTestFiles() {
  */
 fun readTestFile(): String {
     return File(testOutput).readText()
+}
+
+fun readDependenciesDataFromJsonString(jsonString: String): Collection<Dependency> {
+    val gson = Gson()
+    val collectionDependeciesType = object : TypeToken<Collection<Dependency>>() {}.type
+    val dependenciesMap: Collection<Dependency> = gson.fromJson(jsonString, collectionDependeciesType)
+    return dependenciesMap
 }
