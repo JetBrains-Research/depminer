@@ -1,4 +1,4 @@
-package org.jetbrains.research.depminer.actions
+package org.jetbrains.research.depminer.runner
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -6,7 +6,6 @@ import com.intellij.psi.*
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
-import testOutput
 import java.io.File
 
 fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
