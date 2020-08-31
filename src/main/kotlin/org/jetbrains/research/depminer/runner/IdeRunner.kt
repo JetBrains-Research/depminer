@@ -1,8 +1,9 @@
-import com.intellij.ide.impl.ProjectUtil
 import com.intellij.openapi.application.ApplicationStarter
+import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import org.jetbrains.research.depminer.actions.getProjectDependencies
-import org.jetbrains.research.depminer.model.Dependency
 import org.jetbrains.research.depminer.model.convertToJsonString
+import org.jetbrains.research.depminer.runner.projectSetup
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -21,28 +22,35 @@ class IdeRunner : ApplicationStarter {
 
     override fun main(args: Array<out String>) {
 
-        // Arguments number check isn't necessary and is performed by a system
+        // Arguments number check isn't necessary and is handled in extract-dependencies.sh
 
-        println("IDEA instance started. . . ")
+        println("IDEA instance started. . . \n")
         val inputDir = File(projectPath).resolve(args[1])
         println(inputDir.absolutePath) //Debug
 
-        val outputDir = File(projectPath).resolve(args[2])
+        val sourceRootDir = File(projectPath).resolve(args[2])
+        println(sourceRootDir.absolutePath)
+
+        val outputDir = File(projectPath).resolve(args[3])
         println(outputDir.absolutePath) //Debug
 
-        val project = ProjectUtil.openOrImport(inputDir.absolutePath, null, true)
+        val project = projectSetup(inputDir, sourceRootDir, outputDir)
 
-        if (project == null) {
-            println("Could not load project from $inputDir")
-            outputDir.resolve(testOutput).writeText("Could not load the project from $inputDir")
-            exitProcess(0)
+        val dumbService= DumbService.getInstance(project)
+
+        if (!dumbService.isDumb) {
+            runWhenSmart(inputDir, outputDir, project)
+        } else dumbService.runWhenSmart{
+            runWhenSmart(inputDir, outputDir, project)
         }
 
-        println("Successfully opened project at inputDir: $project")
-
-        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
-
-        outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
         exitProcess(0)
+    }
+
+    private fun runWhenSmart(inputDir: File, outputDir: File, project: Project) {
+        println("Indexing finished")
+        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project, outputDir)
+        println("writing to file: ${outputDir.resolve(testOutput)}")
+        outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
     }
 }

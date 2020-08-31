@@ -1,5 +1,6 @@
 package org.jetbrains.research.depminer.model
 
+import com.intellij.psi.*
 import java.io.File
 
 
@@ -14,29 +15,70 @@ enum class ConnectionType {
 /**
  * Describes a [CodeElement] type
  */
+@Deprecated("Language specific logic - unused")
 enum class ElementType {
+    UNDEFINED, // For null safety for now
     FILE,
     CLASS,
     FUNCTION,
-    LINE,
-    FIELD
+    FIELD,
+    OBJECT
 }
 
 /**
- * Structure representing a location (coordinate) in certain file
+ * Determines and returns a [psiElement] type
  *
- * @property line
- * @property offset IntelliJ SDK platform defined offset
+ * @param psiElement an element to inspect
+ *
+ * @return [ElementType]
  */
-data class FileLocation(val line: Int, val offset: Int)
+@Deprecated("Language specific logic - unused")
+fun determineElementType(psiElement: PsiElement): ElementType {
+    return when (psiElement) {
+        is PsiClass -> ElementType.CLASS
+        is PsiMethod -> ElementType.FUNCTION
+        is PsiField -> ElementType.FIELD
+        is PsiFile -> ElementType.FILE
+        is PsiReferenceExpression -> {
+            if (psiElement.hasParentMethodCall()) ElementType.FUNCTION else ElementType.UNDEFINED
+        }
+        else -> ElementType.UNDEFINED
+    }
+}
+
+/**
+ * Checks if a PsiElement has a parent of type PsiMethodCallExpression
+ */
+@Deprecated("Language specific logic - unused")
+private fun PsiElement.hasParentMethodCall(): Boolean {
+    return if (this.parent != null) {
+        if (this.parent is PsiMethodCallExpression) {
+            true
+        } else {
+            this.parent.hasParentMethodCall()
+        }
+    } else false
+}
+
+/* ================= Remove? ==================*/
+
+///**
+// * Structure representing a location (coordinate) in certain file
+// *
+// * @property line
+// * @property offset IntelliJ SDK platform defined offset
+// */
+//data class FileLocation(val line: Int, val offset: Int)
+
+/* ================= Remove? ==================*/
 
 /**
  * Data class representing a region of the file
  *
- * @property start
- * @property end
+ * @property start offset
+ * @property end offset
  */
-data class FileRange(val start: FileLocation?, val end: FileLocation?)
+data class FileRange(val start: Int?, val end: Int?)
 
 /**
  * Full description of code element location in file system
@@ -54,12 +96,12 @@ data class LocationInfo(val path: String, val range: FileRange): AnalysisScope {
  * Data class representing a code element that can form a dependency (field, function/method, class etc)
  *
  * @property location A [LocationInfo] instance containing information about element location on disk
- * @property type [ElementType] of the given code element
+ * @property typeSignature [ElementType] of the given code element
  */
-data class CodeElement(val location: LocationInfo, val type: ElementType)
+data class CodeElement(val location: LocationInfo, val typeSignature: String)
 
 /**
- * Data class describing a dependency betwwen two Code Elements
+ * Data class describing a dependency between two Code Elements
  *
  * @property ConnectionType connection type between two elements
  * @property from 1/2 [CodeElement]
@@ -72,23 +114,44 @@ interface AnalysisScope {
     fun getLocations(): List<LocationInfo>
 }
 
-class FileScope(val path: String): AnalysisScope {
-    override fun getLocations(): List<LocationInfo> {
-        return listOf(LocationInfo(path, FileRange(null, null)))
-    }
-}
+/* ================= Remove? ==================*/
 
-class ProjectScope(val path: String): AnalysisScope {
+//class FileScope(private val path: String): AnalysisScope {
+//    override fun getLocations(): List<LocationInfo> {
+//        return listOf(LocationInfo(path, FileRange(null, null)))
+//    }
+//}
+
+/* ================= Remove? ==================*/
+
+class ProjectScope(private val path: String): AnalysisScope {
     override fun getLocations(): List<LocationInfo> {
         val analysisScope = mutableListOf<LocationInfo>()
         File(path).walk().forEach {
             if (it.isFile) {
-                 if (!it.absolutePath.contains(".idea")) {
-                     // Excluding .idea folder files for now
-                     analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
-                 }
+                if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
+                    // Excluding .idea folder files for now
+                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+                }
             }
         }
         return analysisScope
     }
 }
+
+data class Review(
+        val legacyId: Int,
+        val id: String,
+        val files: List<String>,
+        val commitInfo: CommitInfo,
+        val reviewers: List<UserInfo>,
+        val author: UserInfo
+)
+
+data class UserInfo(val userID: Int, val username: String, val email: String, val displayName: String)
+
+data class CommitInfo(
+        val commitId: String,
+        val project: String,
+        val branch: String
+)

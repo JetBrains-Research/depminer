@@ -2,15 +2,25 @@ package org.jetbrains.research.depminer.model
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
 
 fun convertToJsonString(dependenciesMap: Collection<Dependency>): String {
     val gson = Gson()
     return gson.toJson(dependenciesMap)
 }
 
-fun readFromJsonString(jsonString: String): Collection<Dependency> {
+fun convertSingleDependencyToJSON(dependency: Dependency): String {
     val gson = Gson()
-    val collectionDependeciesType = object : TypeToken<Collection<Dependency>>() {}.type
-    val dependenciesMap: Collection<Dependency> = gson.fromJson(jsonString, collectionDependeciesType)
-    return dependenciesMap
+    return gson.toJson(dependency)
 }
+
+fun parseReviewHistory(pathToFile: String): MutableList<Review> {
+    val gson = Gson()
+    val projectPath: String = System.getProperty("user.dir")
+    val rawJsonString = File(projectPath + pathToFile).readText()
+    val sType = object : TypeToken<List<Review>>() { }.type
+    return gson.fromJson<List<Review>>(rawJsonString, sType) as MutableList<Review>
+}
+
+
+

@@ -15,13 +15,15 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.google.code.gson:gson:2.8.6")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.5.1.201910021850-r")
     testImplementation("junit:junit:4.12")
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.1.2"
-    setPlugins("java", "Kotlin")
+    type = "IU"
+    version = "2020.1.4"
+    setPlugins("java", "Kotlin", "Pythonid:201.8743.12")
 }
 
 tasks {
@@ -34,9 +36,10 @@ tasks {
 
     runIde {
         val dataset: String? by project
+        val source: String? by project
         val output: String? by project
-        args = listOfNotNull("mine-dependencies", dataset, output)
-        jvmArgs = listOf("-Djava.awt.headless=true") // Provides an intellij instance access under the hood
+        args = listOfNotNull("mine-dependencies", dataset, source, output)
+        jvmArgs = listOf("-Djava.awt.headless=true")
     }
 
     register("extractDependencies") {

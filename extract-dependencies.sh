@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if [ $# -ne "2" ]; then
-  echo "usage: extract-dependencies <path to dataset> <path to output folder>"
+if [ $# -ne "3" ]; then
+  echo "usage: extract-dependencies <path to project directory> <path to desired source root> <path to output folder>"
   exit 1
 fi
 
@@ -12,4 +12,4 @@ if uname -s | grep -iq cygwin; then
   PWD=$(cygpath -w "$PWD")
 fi
 
-"$DIR/gradlew" -p "$DIR" extractDependencies -Pdataset="$PWD/$1" -Poutput="$PWD/$2"
+"$DIR/gradlew" -p "$DIR" extractDependencies -Pdataset="$PWD/$1" -Psource="$PWD/$2" -Poutput="$PWD/$3"
