@@ -12,4 +12,4 @@ if uname -s | grep -iq cygwin; then
   PWD=$(cygpath -w "$PWD")
 fi
 
-"$DIR/gradlew" -p "$DIR" extractDependencies -Pdataset="$PWD/$1" -Psource="$PWD/$2" -Poutput="$PWD/$3"
+"$DIR/gradlew" -p "$DIR" extractDependencies -Pdataset="$1" -Psource="$2" -Poutput="$3"
