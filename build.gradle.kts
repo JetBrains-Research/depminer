@@ -15,7 +15,9 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.google.code.gson:gson:2.8.6")
-    implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r") {
+        exclude("org.slf4j")
+    }
     testImplementation("junit:junit:4.12")
 }
 
