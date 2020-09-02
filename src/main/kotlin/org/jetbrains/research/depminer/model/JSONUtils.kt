@@ -16,8 +16,7 @@ fun convertSingleDependencyToJSON(dependency: Dependency): String {
 
 fun parseReviewHistory(pathToFile: String): MutableList<Review> {
     val gson = Gson()
-    val projectPath: String = System.getProperty("user.dir")
-    val rawJsonString = File(projectPath + pathToFile).readText()
+    val rawJsonString = File(pathToFile).readText()
     val sType = object : TypeToken<List<Review>>() { }.type
     return gson.fromJson<List<Review>>(rawJsonString, sType) as MutableList<Review>
 }

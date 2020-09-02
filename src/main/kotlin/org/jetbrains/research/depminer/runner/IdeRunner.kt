@@ -25,8 +25,9 @@ class IdeRunner : ApplicationStarter {
         println("IDEA instance started. . . \n")
         var inputDir: File? = null
         var sourceRootDir: File? = null
-        if (args[1] == "review-mode") {
+        if (args[1].endsWith("review-mode")) {
             val reviewHistoryPath = args[2]
+            println("Looking for review history file at:${File(projectPath).resolve(reviewHistoryPath).absolutePath}")
             val reviewHistory = parseReviewHistory(File(projectPath).resolve(reviewHistoryPath).absolutePath)
             reviewHistory.reverse()
             val newReview = reviewHistory[reviewHistory.lastIndex]
@@ -35,7 +36,6 @@ class IdeRunner : ApplicationStarter {
             inputDir = git.repository.directory
             sourceRootDir = git.repository.directory
         } else {
-            println("arg1 ${args[1]} does not apparently equal \"review-mode\"")
             inputDir = File(projectPath).resolve(args[1])
             println(inputDir.absolutePath) //Debug
             sourceRootDir = File(projectPath).resolve(args[2])
