@@ -1,8 +1,8 @@
 import com.intellij.openapi.application.ApplicationStarter
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
-import org.jetbrains.research.depminer.actions.getProjectDependencies
 import org.jetbrains.research.depminer.model.convertToJsonString
+import org.jetbrains.research.depminer.runner.getProjectDependencies
 import org.jetbrains.research.depminer.runner.projectSetup
 import java.io.File
 import kotlin.system.exitProcess
