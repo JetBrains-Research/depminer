@@ -1,17 +1,18 @@
 import com.intellij.openapi.application.ApplicationStarter
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import org.jetbrains.research.depminer.gitutil.cloneRemoteRepository
 import org.jetbrains.research.depminer.model.convertToJsonString
+import org.jetbrains.research.depminer.model.parseReviewHistory
 import org.jetbrains.research.depminer.runner.getProjectDependencies
 import org.jetbrains.research.depminer.runner.projectSetup
 import java.io.File
 import kotlin.system.exitProcess
 
 /**
- * Resulting data [testContent] will be output to this [testOutput] file upon termination
+ * Resulting data will be written to [testOutput] file upon termination
  */
 const val testOutput = "test-output"
-const val testContent = "test"
 
 
 class IdeRunner : ApplicationStarter {
@@ -21,20 +22,29 @@ class IdeRunner : ApplicationStarter {
     override fun getCommandName(): String = "mine-dependencies"
 
     override fun main(args: Array<out String>) {
-
-        // Arguments number check isn't necessary and is handled in extract-dependencies.sh
-
         println("IDEA instance started. . . \n")
-        val inputDir = File(projectPath).resolve(args[1])
-        println(inputDir.absolutePath) //Debug
-
-        val sourceRootDir = File(projectPath).resolve(args[2])
-        println(sourceRootDir.absolutePath)
-
+        var inputDir: File? = null
+        var sourceRootDir: File? = null
+        if (args[1] == "review-mode") {
+            val reviewHistoryPath = args[2]
+            val reviewHistory = parseReviewHistory(File(projectPath).resolve(reviewHistoryPath).absolutePath)
+            reviewHistory.reverse()
+            val newReview = reviewHistory[reviewHistory.lastIndex]
+            println("Review: $newReview is chosen as the new review for analysis")
+            val git = cloneRemoteRepository(newReview)
+            inputDir = git.repository.directory
+            sourceRootDir = git.repository.directory
+        } else {
+            println("arg1 ${args[1]} does not apparently equal \"review-mode\"")
+            inputDir = File(projectPath).resolve(args[1])
+            println(inputDir.absolutePath) //Debug
+            sourceRootDir = File(projectPath).resolve(args[2])
+            println(sourceRootDir.absolutePath)
+        }
         val outputDir = File(projectPath).resolve(args[3])
         println(outputDir.absolutePath) //Debug
 
-        val project = projectSetup(inputDir, sourceRootDir, outputDir)
+        val project = projectSetup(inputDir!!, sourceRootDir!!, outputDir)
 
         val dumbService= DumbService.getInstance(project)
 
