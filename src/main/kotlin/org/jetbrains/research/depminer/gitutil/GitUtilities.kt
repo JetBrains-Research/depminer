@@ -1,5 +1,6 @@
 package org.jetbrains.research.depminer.gitutil
 
+import com.jetbrains.python.sdk.path
 import currentGitRepoBase
 import org.eclipse.jgit.api.Git
 import org.jetbrains.research.depminer.model.Review
@@ -15,4 +16,8 @@ fun cloneRemoteRepository(newReview: Review, dirPath: String): Git {
         .call()
     println("Cloned repository into:${git.repository.directory.absolutePath}")
     return git
+}
+
+fun openRepoAtPath(pathToRepo: String): Git {
+    return Git.open(File("$pathToRepo/.git"))
 }

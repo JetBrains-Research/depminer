@@ -8,8 +8,8 @@ import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
-fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
-    return getDependencies(ProjectScope(projectPath), project, outputDir)
+fun getProjectDependencies(projectPath: String, project: Project, outputDir: File, mode: String, pathToReviewHistory: String?, pathToClonedRepo: String?): Collection<Dependency> {
+    return getDependencies(ProjectScope(projectPath, mode, pathToReviewHistory, pathToClonedRepo), project, outputDir)
 }
 
 private fun getDependencies(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
