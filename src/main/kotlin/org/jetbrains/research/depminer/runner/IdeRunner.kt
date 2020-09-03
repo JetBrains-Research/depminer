@@ -38,7 +38,7 @@ class IdeRunner : ApplicationStarter {
             println("Looking for review history file at:${File(projectPath).resolve(reviewHistoryPath).absolutePath}")
             val reviewHistory = parseReviewHistory(File(projectPath).resolve(reviewHistoryPath).absolutePath)
             reviewHistory.reverse()
-            val newReview = reviewHistory[reviewHistory.lastIndex]
+            val newReview = reviewHistory[0]
             println("Review: $newReview is chosen as the new review for analysis")
             val git = cloneRemoteRepository(newReview, pathToRepository + clonePath)
             pathToClonedRepo = git.repository.directory.parent

@@ -2,6 +2,7 @@ package org.jetbrains.research.depminer.model
 
 import com.intellij.psi.*
 import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.diff.Edit
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
@@ -9,6 +10,7 @@ import org.jetbrains.research.depminer.gitutil.openRepoAtPath
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import javax.xml.stream.Location
 
 
 /**
@@ -138,7 +140,7 @@ class ProjectScope(private val path: String, private val mode: String, private v
             if (pathToReviewHistory != null) {
                 val reviewHistory = parseReviewHistory(pathToReviewHistory!!)
                 reviewHistory.reverse()
-                val newReview = reviewHistory[reviewHistory.lastIndex]
+                val newReview = reviewHistory[0]
                 val git = openRepoAtPath(pathToClonedRepo!!)
                 val commitId = ObjectId.fromString(newReview.commitInfo.commitId)
                 val commit: RevCommit = git.repository.parseCommit(commitId)
@@ -155,9 +157,23 @@ class ProjectScope(private val path: String, private val mode: String, private v
                     for (entry in diffEntries) {
                         val fileHeader = df.toFileHeader(entry)
                         val edits = fileHeader.toEditList()
+                        for (edit in edits) {
+                            var locationInfo: LocationInfo
+                            if (edit.type == Edit.Type.INSERT) {
+                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginB, edit.endB)) // TODO: Consider adding +1 to range start
+                            } else if (edit.type == Edit.Type.REPLACE) {
+                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginB, edit.endB))
+                            } else if (edit.type == Edit.Type.DELETE) {
+                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginA, edit.endA))
+                            } else {
+                                continue
+                            }
+                            analysisScope.add(locationInfo)
+                        }
                     }
                 }
             }
+            println("Analysis scope: $analysisScope")
         } else {
             File(path).walk().forEach {
                 if (it.isFile) {
