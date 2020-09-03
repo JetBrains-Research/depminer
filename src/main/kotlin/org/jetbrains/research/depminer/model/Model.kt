@@ -152,6 +152,10 @@ class ProjectScope(private val path: String, private val mode: String, private v
                     df.setRepository(git.repository)
                     val diffEntries = df.scan(oldTreeIter, newTreeIter)
                     println(diffEntries)
+                    for (entry in diffEntries) {
+                        val fileHeader = df.toFileHeader(entry)
+                        val edits = fileHeader.toEditList()
+                    }
                 }
             }
         } else {
