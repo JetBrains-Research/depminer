@@ -7,10 +7,8 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.jetbrains.research.depminer.gitutil.openRepoAtPath
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import javax.xml.stream.Location
+import java.io.*
+import java.nio.charset.Charset
 
 
 /**
@@ -87,7 +85,7 @@ private fun PsiElement.hasParentMethodCall(): Boolean {
  * @property start offset
  * @property end offset
  */
-data class FileRange(val start: Int?, val end: Int?)
+data class FileRange(val start: Int, val end: Int)
 
 /**
  * Full description of code element location in file system
@@ -148,7 +146,7 @@ class ProjectScope(private val path: String, private val mode: String, private v
                     val parentCommit = git.repository.parseCommit(commit.parents[0])
                     val reader = git.repository.newObjectReader()
                     val newTreeIter = CanonicalTreeParser(null, reader, commit.tree)
-                    println("Parent commit id: ${parentCommit.id}, its tree id: ${parentCommit.tree}")
+                    //println("Parent commit id: ${parentCommit.id}, its tree id: ${parentCommit.tree}")
                     val oldTreeIter = CanonicalTreeParser(null, reader, parentCommit.tree)
                     val df = DiffFormatter(ByteArrayOutputStream())
                     df.setRepository(git.repository)
@@ -160,11 +158,11 @@ class ProjectScope(private val path: String, private val mode: String, private v
                         for (edit in edits) {
                             var locationInfo: LocationInfo
                             if (edit.type == Edit.Type.INSERT) {
-                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginB, edit.endB)) // TODO: Consider adding +1 to range start
+                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB)) // TODO: Consider adding +1 to range start
                             } else if (edit.type == Edit.Type.REPLACE) {
-                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginB, edit.endB))
+                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB))
                             } else if (edit.type == Edit.Type.DELETE) {
-                                locationInfo = LocationInfo(entry.newPath, FileRange(edit.beginA, edit.endA))
+                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginA, edit.endA))
                             } else {
                                 continue
                             }
@@ -173,18 +171,27 @@ class ProjectScope(private val path: String, private val mode: String, private v
                     }
                 }
             }
-            println("Analysis scope: $analysisScope")
         } else {
             File(path).walk().forEach {
                 if (it.isFile) {
                     if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
                         // Excluding .idea folder files for now
-                        analysisScope.add(LocationInfo(it.absolutePath, FileRange(null, null)))
+                        analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 3)))
                     }
                 }
             }
         }
         return analysisScope
+    }
+
+    private fun getFileLength(it: File): Int {
+        val reader = BufferedReader(InputStreamReader(FileInputStream(it), Charset.defaultCharset()))
+        var charCount = 0
+        while (reader.read() > -1) {
+            charCount++
+        }
+        reader.close()
+        return charCount
     }
 }
 
