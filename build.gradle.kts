@@ -18,6 +18,7 @@ dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r") {
         exclude("org.slf4j")
     }
+    implementation("me.tongfei:progressbar:0.8.1")
     testImplementation("junit:junit:4.12")
 }
 

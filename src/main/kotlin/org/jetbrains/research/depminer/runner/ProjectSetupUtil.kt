@@ -24,12 +24,10 @@ import kotlin.system.exitProcess
 
 fun projectSetup(inputDir: File, sourceRootDir: File, outputDir: File): Project {
     val project = loadProject(inputDir.absolutePath, outputDir)
-    println("Successfully opened project at inputDir: $project \n")
     val projectVirtualFiles = getProjectFiles(project)
     return if (projectVirtualFiles.any() {it.path.endsWith(".iml")}) {
         project
     } else {
-        println("Project setup debug info:")
         visitProjectFiles(project, sourceRootDir)
         project
     }
@@ -49,12 +47,9 @@ fun getProjectFiles(project: Project): Collection<VirtualFile> {
 fun visitProjectFiles(project: Project, sourceRootDir: File) {
     var sourceRootSet = false
     ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
-        println("Project root: $root")
         VfsUtilCore.iterateChildrenRecursively(root, null) { it ->
-            println("Virtual file: $it")
             if (it.path.endsWith(sourceRootDir.path) && !sourceRootSet) {
                 sourceRootSet = true
-                println("Source root: $it")
                 setSourceRootForSingleModule(project, it)
             }
             true
@@ -64,20 +59,15 @@ fun visitProjectFiles(project: Project, sourceRootDir: File) {
 
 fun setSourceRootForSingleModule(project: Project, vfile: VirtualFile) {
     val module = ModuleManager.getInstance(project).modules[0]
-    println("Module: $module")
     ApplicationManager.getApplication().runWriteAction {
         addSourceFolder(vfile.path, module)
     }
-    println("${vfile.path} is set as a source root for the single module")
     true
 }
 
 fun addSourceFolder(relativePath: String, module: Module) {
     val rootModel = ModuleRootManager.getInstance(module).modifiableModel
-    println("Relative path: $relativePath")
-    println("Module file path: ${PathMacroUtil.getModuleDir(module.moduleFilePath)}")
     val directory = File(PathMacroUtil.getModuleDir(module.moduleFilePath)).resolve(relativePath)
-    println("Directory: $directory")
     if (!directory.exists()) {
         directory.mkdirs()
     }
@@ -96,7 +86,7 @@ fun getContentRootFor(url: VirtualFile?, rootModel: ModifiableRootModel): Conten
 }
 
 fun loadProject(path: String, outputDir: File): Project {
-    println("Starting project search at path: $path")
+    //println("Starting project search at path: $path")
     val project = ProjectUtil.openOrImport(path , null, true)
     if (project == null) {
         outputDir.resolve(testOutput).writeText("Could not load project from $path, execution aborted")

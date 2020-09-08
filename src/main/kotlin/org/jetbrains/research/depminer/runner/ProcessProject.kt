@@ -10,12 +10,12 @@ import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
-fun getProjectDependencies(projectPath: String, project: Project, outputDir: File, mode: String, pathToReviewHistory: String?, pathToClonedRepo: String?): Collection<Dependency> {
-    val scope = ProjectScope(projectPath, mode, pathToReviewHistory, pathToClonedRepo)
-    if (scope.getLocations().any { it.range.start == 0 || it.range.end == 0 }) {
-        return getDependenciesSimpleMode(scope, project, outputDir)
+fun getProjectDependencies(projectPath: String, project: Project, outputDir: File, mode: String, newReview: Review?, pathToClonedRepo: String?): Collection<Dependency> {
+    val scope = ProjectScope(projectPath, mode, newReview, pathToClonedRepo)
+    if (mode == "review-mode") {
+        return getDependenciesReviewMode(scope, project, outputDir)
     }
-    return getDependenciesReviewMode(scope, project, outputDir)
+    return getDependenciesSimpleMode(scope, project, outputDir)
 }
 
 private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
@@ -29,34 +29,37 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, ou
             }
         }
     }
-    println("Starting dependencies search in the following files:$psiFiles")
+    //println("Starting dependencies search in the following files:$psiFiles")
     return findDependenciesInFileList(psiFiles, outputDir, scope)
 }
 
 private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
-
     val psiElements = mutableListOf<PsiElement>()
     for (location in scope.getLocations()) {
-        println("Inspecting location: $location")
+        //println("Inspecting location: $location")
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(location.path))
         if (virtualFile != null) {
             val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
             if (psiFile != null) {
                 val startOffset = StringUtil.lineColToOffset(psiFile.text, location.range.start, 0)
-                val endOffset = StringUtil.lineColToOffset(psiFile.text, location.range.end + 1, 0)
+                val endOffset = StringUtil.lineColToOffset(psiFile.text, location.range.end, 0)
                 var caretPosition = startOffset
                 while (caretPosition < endOffset) {
                     val psiLeaf = psiFile.findElementAt(caretPosition)
                     if (psiLeaf != null) {
                         val psiElement = psiLeaf.parent
-                        println("Found element: $psiElement, at offset: $caretPosition")
+                        //println("Found element: $psiElement, at offset: $caretPosition")
                         psiElements.add(psiElement)
                         if (psiElement.children.isNotEmpty()) {
-                            println("Found children of the element...")
+                            val parentLine = StringUtil.offsetToLineNumber(psiFile.text, psiElement.startOffset)
+//                            println("Found children of the element...")
                             psiElement.accept(object: PsiRecursiveElementVisitor()  {
                                 override fun visitElement(element: PsiElement) {
-                                    println("Found child element: $psiElement, at offset: $caretPosition")
-                                    psiElements.add(element)
+                                    //println("Found child element: $element, at offset: ${element.textOffset}")
+                                    if (element.references.isNotEmpty() &&
+                                            StringUtil.offsetToLineNumber(psiFile.text, element.startOffset) == parentLine) {
+                                        psiElements.add(element)
+                                    }
                                     super.visitElement(element)
                                 }
                             })
@@ -67,7 +70,7 @@ private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, ou
             }
         }
     }
-    println("Starting dependencies search for the following elements: $psiElements")
+    println("Starting dependencies search for ${psiElements.size} elements")
     return findDependenciesInElementsList(psiElements)
 }
 
@@ -114,25 +117,29 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency>  {
     val dependenciesMap = mutableListOf<Dependency>()
     val references = psiElement.references
     for (ref in references) {
-        println("Inspecting element: $psiElement")
-        println("Element reference: $ref")
+        //println("Inspecting element: $psiElement")
+        //println("Element reference: $ref")
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
-            println("And it resolves to: ${elementDeclaration.toString()} \n")
+            //println("And it resolves to: ${elementDeclaration.toString()}")
             val dependency = getDependencyForElements(psiElement, elementDeclaration)
             if (dependency != null) {
                 dependenciesMap.add(dependency)
             }
         }
     }
+    /*println("Searching for element usages...")
     val search = ReferencesSearch.search(psiElement)
+    if (search != null) {
+        println("Inspecting usages...\n")
+    }
     for (reference in search) {
         val usage = reference.element
         val dependency = getDependencyForElements(psiElement, usage)
         if (dependency != null) {
             dependenciesMap.add(dependency)
         }
-    }
+    }*/
     return dependenciesMap
 }
 

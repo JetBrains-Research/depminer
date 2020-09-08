@@ -9,6 +9,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.jetbrains.research.depminer.gitutil.openRepoAtPath
 import java.io.*
 import java.nio.charset.Charset
+import java.sql.Timestamp
 
 
 /**
@@ -131,43 +132,38 @@ interface AnalysisScope {
 
 /* ================= Remove? ==================*/
 
-class ProjectScope(private val path: String, private val mode: String, private val pathToReviewHistory:String?, private val pathToClonedRepo: String?): AnalysisScope {
+class ProjectScope(private val path: String, private val mode: String, private val newReview: Review?, private val pathToClonedRepo: String?): AnalysisScope {
     override fun getLocations(): List<LocationInfo> {
         val analysisScope = mutableListOf<LocationInfo>()
-        if (mode == "review-mode") {
-            if (pathToReviewHistory != null) {
-                val reviewHistory = parseReviewHistory(pathToReviewHistory!!)
-                reviewHistory.reverse()
-                val newReview = reviewHistory[0]
-                val git = openRepoAtPath(pathToClonedRepo!!)
-                val commitId = ObjectId.fromString(newReview.commitInfo.commitId)
-                val commit: RevCommit = git.repository.parseCommit(commitId)
-                if (commit.parentCount == 1) {
-                    val parentCommit = git.repository.parseCommit(commit.parents[0])
-                    val reader = git.repository.newObjectReader()
-                    val newTreeIter = CanonicalTreeParser(null, reader, commit.tree)
-                    //println("Parent commit id: ${parentCommit.id}, its tree id: ${parentCommit.tree}")
-                    val oldTreeIter = CanonicalTreeParser(null, reader, parentCommit.tree)
-                    val df = DiffFormatter(ByteArrayOutputStream())
-                    df.setRepository(git.repository)
-                    val diffEntries = df.scan(oldTreeIter, newTreeIter)
-                    println(diffEntries)
-                    for (entry in diffEntries) {
-                        val fileHeader = df.toFileHeader(entry)
-                        val edits = fileHeader.toEditList()
-                        for (edit in edits) {
-                            var locationInfo: LocationInfo
-                            if (edit.type == Edit.Type.INSERT) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB)) // TODO: Consider adding +1 to range start
-                            } else if (edit.type == Edit.Type.REPLACE) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB))
-                            } else if (edit.type == Edit.Type.DELETE) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginA, edit.endA))
-                            } else {
-                                continue
-                            }
-                            analysisScope.add(locationInfo)
+        if (mode == "review-mode" && newReview != null) {
+            val git = openRepoAtPath(pathToClonedRepo!!)
+            val commitId = ObjectId.fromString(newReview.commitInfo.commitId)
+            val commit: RevCommit = git.repository.parseCommit(commitId)
+            if (commit.parentCount == 1) {
+                val parentCommit = git.repository.parseCommit(commit.parents[0])
+                val reader = git.repository.newObjectReader()
+                val newTreeIter = CanonicalTreeParser(null, reader, commit.tree)
+                //println("Parent commit id: ${parentCommit.id}, its tree id: ${parentCommit.tree}")
+                val oldTreeIter = CanonicalTreeParser(null, reader, parentCommit.tree)
+                val df = DiffFormatter(ByteArrayOutputStream())
+                df.setRepository(git.repository)
+                val diffEntries = df.scan(oldTreeIter, newTreeIter)
+                //println(diffEntries)
+                for (entry in diffEntries) {
+                    val fileHeader = df.toFileHeader(entry)
+                    val edits = fileHeader.toEditList()
+                    for (edit in edits) {
+                        var locationInfo: LocationInfo
+                        if (edit.type == Edit.Type.INSERT) {
+                            locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB - 1)) // TODO: Consider adding +1 to range start
+                        } else if (edit.type == Edit.Type.REPLACE) {
+                            locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB - 1))
+                        } else if (edit.type == Edit.Type.DELETE) {
+                            locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginA, edit.endA - 1))
+                        } else {
+                            continue
                         }
+                        analysisScope.add(locationInfo)
                     }
                 }
             }
@@ -201,7 +197,8 @@ data class Review(
         val files: List<String>,
         val commitInfo: CommitInfo,
         val reviewers: List<UserInfo>,
-        val author: UserInfo
+        val author: UserInfo,
+        val timestamp: Timestamp
 )
 
 data class UserInfo(val userID: Int, val username: String, val email: String, val displayName: String)
@@ -211,3 +208,40 @@ data class CommitInfo(
         val project: String,
         val branch: String
 )
+
+fun getAccuracy(newReview: Review, rfReviewers: List<Pair<UserInfo, Int>>, augmentedReviewers: List<Pair<UserInfo, Int>>, topK: Int): Pair<Float, Float> {
+    val targetReviewers = newReview.reviewers
+    var hits = 0
+    for (reviewer in rfReviewers.slice(0..topK)) {
+        if (targetReviewers.contains(reviewer.first)) {
+            hits += 1
+        }
+    }
+    val rfAccuracy = hits.toFloat()/targetReviewers.size
+    hits = 0
+    for (reviewer in augmentedReviewers.slice(0..topK)) {
+        if (targetReviewers.contains(reviewer.first)) {
+            hits += 1
+        }
+    }
+    val augAccuracy = hits.toFloat()/targetReviewers.size
+    return Pair(rfAccuracy, augAccuracy)
+}
+
+fun isCorrect(newReview: Review, reviewers: List<Pair<UserInfo, Int>>, topK: Int): Int {
+    for (reviewer in reviewers.slice(0..topK)) {
+        if (newReview.reviewers.contains(reviewer.first)) {
+            return 1
+        }
+    }
+    return 0
+}
+
+fun oneOverRank(newReview: Review, reviewers: List<Pair<UserInfo, Int>>): Float {
+    for (reviewer in reviewers) {
+        if (newReview.reviewers.contains(reviewer.first)) {
+            return 1/(reviewers.indexOf(reviewer).toFloat() + 1)
+        }
+    }
+    return 0f
+}
