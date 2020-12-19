@@ -12,7 +12,7 @@ import kotlin.system.exitProcess
 /**
  * Resulting data will be written to [testOutput] file upon termination
  */
-const val testOutput = "test-output"
+const val testOutput = "depminer_output"
 
 const val currentGitRepoBase = "https://opendev.org/"
 const val clonePath = "/clonedRepo/"
