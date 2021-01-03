@@ -12,13 +12,10 @@ import java.io.File
 
 fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
     val scope = ProjectScope(projectPath)
-    if (scope.getLocations().any { it.range.start == 0 || it.range.end == 0 }) {
-        return getDependenciesSimpleMode(scope, project, outputDir)
-    }
-    return getDependenciesReviewMode(scope, project, outputDir)
+    return getProjectDependencies(scope, project, outputDir)
 }
 
-private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
+private fun getProjectDependencies(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
     val psiFiles = mutableListOf<PsiFile>()
     for (element in scope.getLocations()) {
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(element.path))
@@ -31,43 +28,6 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, ou
     }
     println("Starting dependencies search in the following files:$psiFiles")
     return findDependenciesInFileList(psiFiles, outputDir, scope)
-}
-
-private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
-    val psiElements = mutableListOf<PsiElement>()
-    for (location in scope.getLocations()) {
-        println("Inspecting location: $location")
-        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(location.path))
-        if (virtualFile != null) {
-            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
-            if (psiFile != null) {
-                val startOffset = StringUtil.lineColToOffset(psiFile.text, location.range.start, 0)
-                val endOffset = StringUtil.lineColToOffset(psiFile.text, location.range.end + 1, 0)
-                var caretPosition = startOffset
-                while (caretPosition < endOffset) {
-                    val psiLeaf = psiFile.findElementAt(caretPosition)
-                    if (psiLeaf != null) {
-                        val psiElement = psiLeaf.parent
-                        println("Found element: $psiElement, at offset: $caretPosition")
-                        psiElements.add(psiElement)
-                        if (psiElement.children.isNotEmpty()) {
-                            println("Found children of the element...")
-                            psiElement.accept(object: PsiRecursiveElementVisitor()  {
-                                override fun visitElement(element: PsiElement) {
-                                    println("Found child element: $psiElement, at offset: $caretPosition")
-                                    psiElements.add(element)
-                                    super.visitElement(element)
-                                }
-                            })
-                        }
-                        caretPosition += psiElement.textLength
-                    }
-                }
-            }
-        }
-    }
-    println("Starting dependencies search for the following elements: $psiElements")
-    return findDependenciesInElementsList(psiElements)
 }
 
 private fun findDependenciesInElementsList(psiElements: Collection<PsiElement>): Collection<Dependency> {
