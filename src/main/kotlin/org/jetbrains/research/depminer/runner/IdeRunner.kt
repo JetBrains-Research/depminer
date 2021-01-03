@@ -15,10 +15,9 @@ const val testOutput = "depminer_output"
 
 
 class IdeRunner : ApplicationStarter {
-
     private val projectPath: String = System.getProperty("user.dir")
 
-    override fun getCommandName(): String = "mine-dependencies"
+    override fun getCommandName(): String = "extract-dependencies"
 
     override fun main(args: Array<out String>) {
         println("IDEA instance started. . . \n")
@@ -28,13 +27,13 @@ class IdeRunner : ApplicationStarter {
         sourceRootDir = File(projectPath).resolve(args[2])
         val outputDir = File(projectPath).resolve(args[3])
         val project = projectSetup(inputDir, sourceRootDir, outputDir)
+        /* Now wait for indexing to finish, so that references can be resolved */
         val dumbService= DumbService.getInstance(project)
         if (!dumbService.isDumb) {
             runWhenSmart(inputDir, outputDir, project)
         } else dumbService.runWhenSmart{
             runWhenSmart(inputDir, outputDir, project)
         }
-        // TODO: Cleanup cloned repository
         exitProcess(0)
     }
 
