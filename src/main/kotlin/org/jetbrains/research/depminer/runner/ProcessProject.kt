@@ -10,8 +10,8 @@ import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
-fun getProjectDependencies(projectPath: String, project: Project, outputDir: File, mode: String, pathToReviewHistory: String?, pathToClonedRepo: String?): Collection<Dependency> {
-    val scope = ProjectScope(projectPath, mode, pathToReviewHistory, pathToClonedRepo)
+fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
+    val scope = ProjectScope(projectPath)
     if (scope.getLocations().any { it.range.start == 0 || it.range.end == 0 }) {
         return getDependenciesSimpleMode(scope, project, outputDir)
     }
@@ -34,7 +34,6 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, ou
 }
 
 private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
-
     val psiElements = mutableListOf<PsiElement>()
     for (location in scope.getLocations()) {
         println("Inspecting location: $location")

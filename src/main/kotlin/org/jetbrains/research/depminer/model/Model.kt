@@ -6,7 +6,6 @@ import org.eclipse.jgit.diff.Edit
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
-import org.jetbrains.research.depminer.gitutil.openRepoAtPath
 import java.io.*
 import java.nio.charset.Charset
 
@@ -16,7 +15,6 @@ import java.nio.charset.Charset
  */
 enum class ConnectionType {
     USAGE, // "from" - usage, "to" - declaration of the element
-    FILE_DEPENDENCY // "from" file uses "to" file data
 }
 
 /**
@@ -121,63 +119,14 @@ interface AnalysisScope {
     fun getLocations(): List<LocationInfo>
 }
 
-/* ================= Remove? ==================*/
-
-//class FileScope(private val path: String): AnalysisScope {
-//    override fun getLocations(): List<LocationInfo> {
-//        return listOf(LocationInfo(path, FileRange(null, null)))
-//    }
-//}
-
-/* ================= Remove? ==================*/
-
-class ProjectScope(private val path: String, private val mode: String, private val pathToReviewHistory:String?, private val pathToClonedRepo: String?): AnalysisScope {
+class ProjectScope(private val path: String): AnalysisScope {
     override fun getLocations(): List<LocationInfo> {
         val analysisScope = mutableListOf<LocationInfo>()
-        if (mode == "review-mode") {
-            if (pathToReviewHistory != null) {
-                val reviewHistory = parseReviewHistory(pathToReviewHistory!!)
-                reviewHistory.reverse()
-                val newReview = reviewHistory[0]
-                val git = openRepoAtPath(pathToClonedRepo!!)
-                val commitId = ObjectId.fromString(newReview.commitInfo.commitId)
-                val commit: RevCommit = git.repository.parseCommit(commitId)
-                if (commit.parentCount == 1) {
-                    val parentCommit = git.repository.parseCommit(commit.parents[0])
-                    val reader = git.repository.newObjectReader()
-                    val newTreeIter = CanonicalTreeParser(null, reader, commit.tree)
-                    //println("Parent commit id: ${parentCommit.id}, its tree id: ${parentCommit.tree}")
-                    val oldTreeIter = CanonicalTreeParser(null, reader, parentCommit.tree)
-                    val df = DiffFormatter(ByteArrayOutputStream())
-                    df.setRepository(git.repository)
-                    val diffEntries = df.scan(oldTreeIter, newTreeIter)
-                    println(diffEntries)
-                    for (entry in diffEntries) {
-                        val fileHeader = df.toFileHeader(entry)
-                        val edits = fileHeader.toEditList()
-                        for (edit in edits) {
-                            var locationInfo: LocationInfo
-                            if (edit.type == Edit.Type.INSERT) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB)) // TODO: Consider adding +1 to range start
-                            } else if (edit.type == Edit.Type.REPLACE) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginB, edit.endB))
-                            } else if (edit.type == Edit.Type.DELETE) {
-                                locationInfo = LocationInfo(pathToClonedRepo + "/" + entry.newPath, FileRange(edit.beginA, edit.endA))
-                            } else {
-                                continue
-                            }
-                            analysisScope.add(locationInfo)
-                        }
-                    }
-                }
-            }
-        } else {
-            File(path).walk().forEach {
-                if (it.isFile) {
-                    if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
-                        // Excluding .idea folder files for now
-                        analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 3)))
-                    }
+        File(path).walk().forEach {
+            if (it.isFile) {
+                if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
+                    // Excluding .idea folder files for now
+                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 3)))
                 }
             }
         }
@@ -194,20 +143,3 @@ class ProjectScope(private val path: String, private val mode: String, private v
         return charCount
     }
 }
-
-data class Review(
-        val legacyId: Int,
-        val id: String,
-        val files: List<String>,
-        val commitInfo: CommitInfo,
-        val reviewers: List<UserInfo>,
-        val author: UserInfo
-)
-
-data class UserInfo(val userID: Int, val username: String, val email: String, val displayName: String)
-
-data class CommitInfo(
-        val commitId: String,
-        val project: String,
-        val branch: String
-)
