@@ -12,18 +12,11 @@ import java.nio.charset.Charset
 
 
 /**
- * Describes a connection type between two elements [CodeElement] in the [Dependency] class
- */
-enum class ConnectionType {
-    USAGE, // "from" - usage, "to" - declaration of the element
-}
-
-/**
  * Describes a [CodeElement] type
+ * Currently describes
  */
-@Deprecated("Language specific logic - unused")
 enum class ElementType {
-    UNDEFINED, // For null safety for now
+    UNDEFINED,
     FILE,
     CLASS,
     FUNCTION,
@@ -31,13 +24,13 @@ enum class ElementType {
 }
 
 /**
- * Determines and returns a [psiElement] type
+ * Determines and returns a [psiElement] type for Java code.
+ * Function can be modified to support similar logic for other languages
  *
  * @param psiElement an element to inspect
  *
  * @return [ElementType]
  */
-@Deprecated("Language specific logic - unused")
 fun determineElementType(psiElement: PsiElement): ElementType {
     return when (psiElement) {
         is PsiClass -> ElementType.CLASS
@@ -100,7 +93,7 @@ data class CodeElement(val location: LocationInfo, val typeSignature: String)
  * @property from 1/2 [CodeElement]
  * @property to 2/2 [CodeElement], a pair of Code Elements forming a dependency
  */
-data class Dependency(val type: ConnectionType, val from: CodeElement, val to: CodeElement)
+data class Dependency(val from: CodeElement, val to: CodeElement)
 
 
 interface AnalysisScope {

@@ -122,14 +122,14 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency>  {
             }
         }
     }
-    val search = ReferencesSearch.search(psiElement)
-    for (reference in search) {
-        val usage = reference.element
-        val dependency = getDependencyForElements(psiElement, usage)
-        if (dependency != null) {
-            dependenciesMap.add(dependency)
-        }
-    }
+//    val search = ReferencesSearch.search(psiElement)
+//    for (reference in search) {
+//        val usage = reference.element
+//        val dependency = getDependencyForElements(psiElement, usage)
+//        if (dependency != null) {
+//            dependenciesMap.add(dependency)
+//        }
+//    }
     return dependenciesMap
 }
 
@@ -148,7 +148,7 @@ fun getDependencyForElements(psiElement: PsiElement, elementDeclaration: PsiElem
             val toElementType = elementDeclaration.toString().substringBefore(':')
 
             val codeElementDeclaration = CodeElement(LocationInfo(elementDeclaration.containingFile.virtualFile.path, toElementRange), toElementType)
-            return Dependency(ConnectionType.USAGE, codeElement, codeElementDeclaration) //Usage only? Consider getting rid of
+            return Dependency(codeElement, codeElementDeclaration)
         }
     }
     return null
