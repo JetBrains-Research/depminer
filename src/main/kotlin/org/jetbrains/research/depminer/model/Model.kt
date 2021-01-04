@@ -27,6 +27,7 @@ enum class ElementType {
     CLASS,
     FUNCTION,
     FIELD,
+    OBJECT
 }
 
 /**
@@ -63,6 +64,18 @@ private fun PsiElement.hasParentMethodCall(): Boolean {
         }
     } else false
 }
+
+/* ================= Remove? ==================*/
+
+///**
+// * Structure representing a location (coordinate) in certain file
+// *
+// * @property line
+// * @property offset IntelliJ SDK platform defined offset
+// */
+//data class FileLocation(val line: Int, val offset: Int)
+
+/* ================= Remove? ==================*/
 
 /**
  * Data class representing a region of the file
@@ -112,8 +125,8 @@ class ProjectScope(private val path: String): AnalysisScope {
         File(path).walk().forEach {
             if (it.isFile) {
                 if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
-                    /* Excluding hidden files, files in /idea/ folder as well as build files in /out/ */
-                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 0)))
+                    // Excluding .idea folder files for now
+                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 3)))
                 }
             }
         }

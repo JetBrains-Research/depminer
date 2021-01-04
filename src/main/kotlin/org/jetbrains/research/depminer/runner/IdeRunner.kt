@@ -17,7 +17,7 @@ const val testOutput = "depminer_output"
 class IdeRunner : ApplicationStarter {
     private val projectPath: String = System.getProperty("user.dir")
 
-    override fun getCommandName(): String = "mine-dependencies"
+    override fun getCommandName(): String = "extract-dependencies"
 
     override fun main(args: Array<out String>) {
         println("IDEA instance started. . . \n")
