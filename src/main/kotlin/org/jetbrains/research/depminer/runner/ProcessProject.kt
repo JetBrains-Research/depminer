@@ -12,7 +12,7 @@ import java.io.File
 
 fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
     val scope = ProjectScope(projectPath)
-    return getDependenciesSimpleMode(scope, project, outputDir)
+    return getDependenciesReviewMode(scope, project, outputDir)
 }
 
 private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
@@ -38,11 +38,12 @@ private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, ou
         if (virtualFile != null) {
             val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
             if (psiFile != null) {
-                val startOffset = StringUtil.lineColToOffset(psiFile.text, location.range.start, 0)
-                val endOffset = StringUtil.lineColToOffset(psiFile.text, location.range.end + 1, 0)
+                val startOffset = 0
+                val endOffset = psiFile.textLength
                 var caretPosition = startOffset
                 while (caretPosition < endOffset) {
                     val psiLeaf = psiFile.findElementAt(caretPosition)
+                    println("Inspecting element: $psiLeaf")
                     if (psiLeaf != null) {
                         val psiElement = psiLeaf.parent
                         println("Found element: $psiElement, at offset: $caretPosition")
