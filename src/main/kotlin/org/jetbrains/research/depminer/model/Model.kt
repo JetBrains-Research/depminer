@@ -6,6 +6,7 @@ import org.eclipse.jgit.diff.Edit
 import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.treewalk.CanonicalTreeParser
+import org.jetbrains.research.depminer.util.countLines
 import java.io.*
 import java.nio.charset.Charset
 
@@ -26,8 +27,7 @@ enum class ElementType {
     FILE,
     CLASS,
     FUNCTION,
-    FIELD,
-    OBJECT
+    FIELD
 }
 
 /**
@@ -64,18 +64,6 @@ private fun PsiElement.hasParentMethodCall(): Boolean {
         }
     } else false
 }
-
-/* ================= Remove? ==================*/
-
-///**
-// * Structure representing a location (coordinate) in certain file
-// *
-// * @property line
-// * @property offset IntelliJ SDK platform defined offset
-// */
-//data class FileLocation(val line: Int, val offset: Int)
-
-/* ================= Remove? ==================*/
 
 /**
  * Data class representing a region of the file
@@ -126,20 +114,10 @@ class ProjectScope(private val path: String): AnalysisScope {
             if (it.isFile) {
                 if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
                     // Excluding .idea folder files for now
-                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, 3)))
+                    analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, countLines(it.absolutePath))))
                 }
             }
         }
         return analysisScope
-    }
-
-    private fun getFileLength(it: File): Int {
-        val reader = BufferedReader(InputStreamReader(FileInputStream(it), Charset.defaultCharset()))
-        var charCount = 0
-        while (reader.read() > -1) {
-            charCount++
-        }
-        reader.close()
-        return charCount
     }
 }

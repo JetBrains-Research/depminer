@@ -28,8 +28,8 @@ class BasicTest {
         val projectPath = System.getProperty("user.dir")
         val projectScope = ProjectScope("$projectPath/testData/testProjects/kotlinTestProject")
         val desiredProjectScope = listOf(
-            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt", FileRange(null, null)),
-            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(null, null)))
+            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt", FileRange(0, 0)),
+            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(0, 0)))
         Assert.assertTrue(
             "Two kotlin files found: Main.kt and Utility.kt",
             projectScope.getLocations() == desiredProjectScope
