@@ -18,5 +18,10 @@
 
     <actions>
         <!-- Add your actions here -->
+        <action id="ResolveElementAction" class="org.jetbrains.research.depminer.actions.ResolveElementAction"
+                text="Find Element Declaration Test"
+                description="Finds element&#39;s declaration from the reference, if applicable">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>
