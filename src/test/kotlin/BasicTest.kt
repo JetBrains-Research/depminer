@@ -1,4 +1,5 @@
 import org.jetbrains.research.depminer.model.*
+import org.jetbrains.research.depminer.util.countLines
 import org.junit.AfterClass
 import org.junit.Assert
 import org.junit.Test
@@ -28,8 +29,8 @@ class BasicTest {
         val projectPath = System.getProperty("user.dir")
         val projectScope = ProjectScope("$projectPath/testData/testProjects/kotlinTestProject")
         val desiredProjectScope = listOf(
-            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt", FileRange(0, 0)),
-            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(0, 0)))
+            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt", FileRange(0, countLines("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt"))),
+            LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(0, countLines("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt"))))
         Assert.assertTrue(
             "Two kotlin files found: Main.kt and Utility.kt",
             projectScope.getLocations() == desiredProjectScope
