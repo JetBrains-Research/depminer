@@ -1,0 +1,11 @@
+version: 2.1
+jobs:
+  
+  build:
+    machine:
+      enabled: true
+    working_directory: ~/depminer
+    steps:
+      - checkout:
+          path: ~/depminer
+      - run: ./gradlew build --stacktrace
