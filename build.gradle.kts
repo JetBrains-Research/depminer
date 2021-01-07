@@ -25,7 +25,7 @@ dependencies {
 intellij {
     type = "IU"
     version = "2020.1.4"
-    setPlugins("java", "Kotlin", "Pythonid:201.8743.12")
+    setPlugins("java", "Kotlin", "Pythonid:201.8743.20")
 }
 
 tasks {
