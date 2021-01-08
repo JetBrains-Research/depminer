@@ -4,33 +4,17 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.*
-import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 import org.jetbrains.research.depminer.model.*
 import java.io.File
 
-fun getProjectDependencies(projectPath: String, project: Project, outputDir: File): Collection<Dependency> {
+fun getProjectDependencies(projectPath: String, project: Project): Collection<Dependency> {
     val scope = ProjectScope(projectPath)
-    return getDependenciesReviewMode(scope, project, outputDir)
+    return getDependenciesSimpleMode(scope, project)
 }
 
-private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
-    val psiFiles = mutableListOf<PsiFile>()
-    for (element in scope.getLocations()) {
-        val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(element.path))
-        if (virtualFile != null) {
-            val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
-            if (psiFile != null) {
-                psiFiles.add(psiFile)
-            }
-        }
-    }
-    println("Starting dependencies search in the following files:$psiFiles")
-    return findDependenciesInFileList(psiFiles, outputDir, scope)
-}
-
-private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, outputDir: File): Collection<Dependency> {
+private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): Collection<Dependency> {
     val psiElements = mutableListOf<PsiElement>()
     for (location in scope.getLocations()) {
         println("Inspecting location: $location")
@@ -52,8 +36,10 @@ private fun getDependenciesReviewMode(scope: AnalysisScope, project: Project, ou
                             println("Found children of the element...")
                             psiElement.accept(object: PsiRecursiveElementVisitor()  {
                                 override fun visitElement(element: PsiElement) {
-                                    println("Found child element: $psiElement, at offset: $caretPosition")
-                                    psiElements.add(element)
+                                    println("Found child element: $element, at offset: $caretPosition")
+                                    if (element.references.isNotEmpty()) {
+                                        psiElements.add(element)
+                                    }
                                     super.visitElement(element)
                                 }
                             })

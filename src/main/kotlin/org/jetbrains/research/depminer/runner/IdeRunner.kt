@@ -39,7 +39,7 @@ class IdeRunner : ApplicationStarter {
 
     private fun runWhenSmart(inputDir: File, outputDir: File, project: Project) {
         println("Indexing finished")
-        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project, outputDir)
+        val dependenciesMap = getProjectDependencies(inputDir.absolutePath, project)
         println("writing to file: ${outputDir.resolve(testOutput)}")
         outputDir.resolve(testOutput).writeText(convertToJsonString(dependenciesMap))
     }
