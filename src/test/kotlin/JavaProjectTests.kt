@@ -30,7 +30,7 @@ class JavaProjectTests {
         Assert.assertFalse("Dependencies list is not empty", readTestFile() == "[]")
         val dependencies = readDependenciesDataFromJsonString(readTestFile())
         Assert.assertTrue("Main.java should depend on Util.java",
-            dependencies.any { it.from.isInFile("Main.java") && it.to.isInFile("Util.java") })
+            dependencies.any { it.betweenFiles("Main.java", "Util.java") })
     }
 
     @Test
