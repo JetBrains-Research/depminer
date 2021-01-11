@@ -27,16 +27,16 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): C
                 var caretPosition = startOffset
                 while (caretPosition < endOffset) {
                     val psiLeaf = psiFile.findElementAt(caretPosition)
-                    println("Inspecting element: $psiLeaf")
+                    // println("Inspecting element: $psiLeaf")
                     if (psiLeaf != null) {
                         val psiElement = psiLeaf.parent
-                        println("Found element: $psiElement, at offset: $caretPosition")
+                        // println("Found element: $psiElement, at offset: $caretPosition")
                         psiElements.add(psiElement)
                         if (psiElement.children.isNotEmpty()) {
-                            println("Found children of the element...")
+                            // println("Found children of the element...")
                             psiElement.accept(object: PsiRecursiveElementVisitor()  {
                                 override fun visitElement(element: PsiElement) {
-                                    println("Found child element: $element, at offset: $caretPosition")
+                                    // println("Found child element: $element, at offset: $caretPosition")
                                     if (element.references.isNotEmpty()) {
                                         psiElements.add(element)
                                     }
@@ -50,7 +50,7 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): C
             }
         }
     }
-    println("Starting dependencies search for the following elements: $psiElements")
+    // println("Starting dependencies search for the following elements: $psiElements")
     return findDependenciesInElementsList(psiElements)
 }
 
