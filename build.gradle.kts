@@ -23,7 +23,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version = "2020.2.4"
+    version = "2020.1.4"
     setPlugins("java", "Kotlin")
 }
 
