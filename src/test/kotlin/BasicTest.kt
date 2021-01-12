@@ -28,7 +28,7 @@ class BasicTest {
     fun `Project Scope is Derived From Project Path Correctly`() {
         val projectPath = System.getProperty("user.dir")
         val projectScope = ProjectScope("$projectPath/testData/testProjects/kotlinTestProject")
-        println(projectScope)
+        println(projectScope.getLocations())
         val desiredProjectScope = listOf(
             LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt", FileRange(0, countLines("$projectPath/testData/testProjects/kotlinTestProject/src/Main.kt"))),
             LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(0, countLines("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt"))))
