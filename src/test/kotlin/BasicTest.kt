@@ -16,13 +16,13 @@ class BasicTest {
         }
     }
 
-//    @Test
-//    fun `Null Safety In Project Setup`() {
-//        val testInputPath = "/testData/testProjects/NoSuchProject"
-//        val testSrcPath = "/testData/testProjects/NoSuchProject/src/"
-//        val exitCode = runIde(testInputPath, testSrcPath, ".")
-//        Assert.assertNotEquals("IDE finished with non zero code", 0, exitCode)
-//    }
+    @Test
+    fun `Null Safety In Project Setup`() {
+        val testInputPath = "/testData/testProjects/NoSuchProject"
+        val testSrcPath = "/testData/testProjects/NoSuchProject/src/"
+        val exitCode = runIde(testInputPath, testSrcPath, ".")
+        Assert.assertNotEquals("IDE finished with non zero code", 0, exitCode)
+    }
     
     @Test
     fun `Project Scope is Derived From Project Path Correctly`() {
