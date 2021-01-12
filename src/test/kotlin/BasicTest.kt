@@ -34,7 +34,7 @@ class BasicTest {
             LocationInfo("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt", FileRange(0, countLines("$projectPath/testData/testProjects/kotlinTestProject/src/Utility.kt"))))
         Assert.assertTrue(
             "Two kotlin files found: Main.kt and Utility.kt",
-            projectScope.getLocations() == desiredProjectScope
+            projectScope.getLocations().containsAll(desiredProjectScope)
         )
     }
 }
