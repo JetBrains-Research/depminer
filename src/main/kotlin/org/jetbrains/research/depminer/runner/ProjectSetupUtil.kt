@@ -29,7 +29,6 @@ fun projectSetup(inputDir: File, sourceRootDir: File, outputDir: File): Project 
     return if (projectVirtualFiles.any() {it.path.endsWith(".iml")}) {
         project
     } else {
-        println("Project setup debug info:")
         visitProjectFiles(project, sourceRootDir)
         project
     }
@@ -49,12 +48,9 @@ fun getProjectFiles(project: Project): Collection<VirtualFile> {
 fun visitProjectFiles(project: Project, sourceRootDir: File) {
     var sourceRootSet = false
     ProjectRootManager.getInstance(project).contentRoots.forEach { root ->
-        println("Project root: $root")
         VfsUtilCore.iterateChildrenRecursively(root, null) { it ->
-            println("Virtual file: $it")
             if (it.path.endsWith(sourceRootDir.path) && !sourceRootSet) {
                 sourceRootSet = true
-                println("Source root: $it")
                 setSourceRootForSingleModule(project, it)
             }
             true
@@ -64,20 +60,15 @@ fun visitProjectFiles(project: Project, sourceRootDir: File) {
 
 fun setSourceRootForSingleModule(project: Project, vfile: VirtualFile) {
     val module = ModuleManager.getInstance(project).modules[0]
-    println("Module: $module")
     ApplicationManager.getApplication().runWriteAction {
         addSourceFolder(vfile.path, module)
     }
-    println("${vfile.path} is set as a source root for the single module")
     true
 }
 
 fun addSourceFolder(relativePath: String, module: Module) {
     val rootModel = ModuleRootManager.getInstance(module).modifiableModel
-    println("Relative path: $relativePath")
-    println("Module file path: ${PathMacroUtil.getModuleDir(module.moduleFilePath)}")
     val directory = File(PathMacroUtil.getModuleDir(module.moduleFilePath)).resolve(relativePath)
-    println("Directory: $directory")
     if (!directory.exists()) {
         directory.mkdirs()
     }
