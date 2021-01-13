@@ -17,7 +17,6 @@ fun getProjectDependencies(projectPath: String, project: Project): Collection<De
 private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): Collection<Dependency> {
     val psiElements = mutableListOf<PsiElement>()
     for (location in scope.getLocations()) {
-        println("Inspecting location: $location")
         val virtualFile = LocalFileSystem.getInstance().findFileByIoFile(File(location.path))
         if (virtualFile != null) {
             val psiFile = PsiManager.getInstance(project).findFile(virtualFile)
@@ -27,16 +26,12 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): C
                 var caretPosition = startOffset
                 while (caretPosition < endOffset) {
                     val psiLeaf = psiFile.findElementAt(caretPosition)
-                    // println("Inspecting element: $psiLeaf")
                     if (psiLeaf != null) {
                         val psiElement = psiLeaf.parent
-                        // println("Found element: $psiElement, at offset: $caretPosition")
                         psiElements.add(psiElement)
                         if (psiElement.children.isNotEmpty()) {
-                            // println("Found children of the element...")
                             psiElement.accept(object: PsiRecursiveElementVisitor()  {
                                 override fun visitElement(element: PsiElement) {
-                                    // println("Found child element: $element, at offset: $caretPosition")
                                     if (element.references.isNotEmpty()) {
                                         psiElements.add(element)
                                     }
@@ -50,7 +45,6 @@ private fun getDependenciesSimpleMode(scope: AnalysisScope, project: Project): C
             }
         }
     }
-    // println("Starting dependencies search for the following elements: $psiElements")
     return findDependenciesInElementsList(psiElements)
 }
 
@@ -97,17 +91,17 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency>  {
     val dependenciesMap = mutableListOf<Dependency>()
     val references = psiElement.references
     for (ref in references) {
-        println("Inspecting element: $psiElement")
-        println("Element reference: $ref")
         val elementDeclaration = ref.resolve()
         if (elementDeclaration != null) {
-            println("And it resolves to: ${elementDeclaration.toString()} \n")
             val dependency = getDependencyForElements(psiElement, elementDeclaration)
             if (dependency != null) {
                 dependenciesMap.add(dependency)
             }
         }
     }
+
+//    Reference search allows to perform the "resolving" of a reference the other way around.
+//    By discovering all references pointing to the given element. Note - this action is very computationally expensive.
 //    val search = ReferencesSearch.search(psiElement)
 //    for (reference in search) {
 //        val usage = reference.element
@@ -116,6 +110,7 @@ private fun visitPsiElement(psiElement: PsiElement): Collection<Dependency>  {
 //            dependenciesMap.add(dependency)
 //        }
 //    }
+
     return dependenciesMap
 }
 
