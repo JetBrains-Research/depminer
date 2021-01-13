@@ -1,14 +1,8 @@
 package org.jetbrains.research.depminer.model
 
 import com.intellij.psi.*
-import org.eclipse.jgit.diff.DiffFormatter
-import org.eclipse.jgit.diff.Edit
-import org.eclipse.jgit.lib.ObjectId
-import org.eclipse.jgit.revwalk.RevCommit
-import org.eclipse.jgit.treewalk.CanonicalTreeParser
 import org.jetbrains.research.depminer.util.countLines
 import java.io.*
-import java.nio.charset.Charset
 
 
 /**
@@ -46,8 +40,8 @@ fun determineElementType(psiElement: PsiElement): ElementType {
 
 /**
  * Checks if a PsiElement has a parent of type PsiMethodCallExpression
+ * Similar logic can be implemented for other languages
  */
-@Deprecated("Language specific logic - unused")
 private fun PsiElement.hasParentMethodCall(): Boolean {
     return if (this.parent != null) {
         if (this.parent is PsiMethodCallExpression) {
@@ -106,7 +100,7 @@ class ProjectScope(private val path: String): AnalysisScope {
         File(path).walk().forEach {
             if (it.isFile) {
                 if (!it.absolutePath.contains(".idea") and !it.absolutePath.contains("out") and !it.isHidden) {
-                    // Excluding .idea folder files for now
+                    /* Other directories and file types (e.g. .iml files) can be excluded similarly */
                     analysisScope.add(LocationInfo(it.absolutePath, FileRange(0, countLines(it.absolutePath))))
                 }
             }
