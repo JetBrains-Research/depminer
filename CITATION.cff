@@ -1,0 +1,15 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+preferred-citation:
+  type: article
+  title: "DepMiner: A Pipelineable Tool for Mining of Intra-Project Dependencies"
+  authors:
+    - family-names: Repinskiy
+      given-names: Vladislav
+    - family-names: Kovalenko
+      given-names: Vladimir
+  year: 2021
+  journal: "arXiv"
+  identifiers:
+    - type: url
+      value: "https://arxiv.org/abs/2104.09473"
